@@ -1,6 +1,6 @@
 # Text2Scene
 
-Stylized, depth-consistent 3D scene generation from text prompts, with DreamBooth, Stable Diffusion 3 and ControlNet.
+Stylized, depth-consistent 3D scene generation for movies from text prompts, with DreamBooth, Stable Diffusion 3 and ControlNet.
 
 ## Directory Structure
 
