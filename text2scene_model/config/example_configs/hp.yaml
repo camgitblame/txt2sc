@@ -1,0 +1,7 @@
+runs_dir: hp/output
+seed: 0
+frames: 30
+
+stable_diffusion_checkpoint: "hp/hp-sd3"
+
+inpainting_prompt: "POV, walkthrough, the great hall from hph harrypotter, masterpiece, indoor scene, best quality"

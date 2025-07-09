@@ -1,0 +1,13 @@
+txt2sc/
+website/
+stable-diffusion/
+SceneScape/
+LoRA/
+data/
+sd3/
+Related Work/
+unused/
+wandb/
+.DS_Store
+*-output/
+*.ipynb
