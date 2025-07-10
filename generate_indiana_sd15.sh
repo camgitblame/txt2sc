@@ -10,4 +10,4 @@
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
 
-python generate_indiana.py
+python generate_indiana_sd15.py
