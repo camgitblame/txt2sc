@@ -14,7 +14,6 @@ from diffusers import (
     DPMSolverMultistepScheduler,
     AutoencoderKL,
     SD3ControlNetModel,
-    StableDiffusion3InpaintPipeline,
 )
 from einops import rearrange
 from kornia.geometry import (
@@ -59,7 +58,7 @@ class WarpInpaintModel(torch.nn.Module):
         self.inpainting_prompt = config["inpainting_prompt"]
 
         controlnet = SD3ControlNetModel.from_pretrained(
-            "alimama-creative/SD3-Controlnet-Inpainting",
+            "../sd3con",
             extra_conditioning_channels=1,
             torch_dtype=torch.float16,
         )
@@ -67,7 +66,6 @@ class WarpInpaintModel(torch.nn.Module):
         self.inpainting_pipeline = (
             StableDiffusion3ControlNetInpaintingPipeline.from_pretrained(
                 self.config["stable_diffusion_checkpoint"],
-                safety_checker=None,
                 controlnet=controlnet,
                 torch_dtype=torch.float16,
             )
@@ -77,43 +75,22 @@ class WarpInpaintModel(torch.nn.Module):
             self.inpainting_pipeline.scheduler.config
         )
         self.inpainting_pipeline = self.inpainting_pipeline.to(self.device)
-        # self.inpainting_pipeline.load_ip_adapter(
-        #     "h94/IP-Adapter", subfolder="models", weight_name="ip-adapter_sd15.bin"
-        # )
-
-        # scale = {
-        #     # "down": {"block_2": [0.0, 1.0]},
-        #     "up": {"block_0": [0.0, 1.0, 0.0]},
-        # }
-
-        # self.inpainting_pipeline.set_ip_adapter_scale(0.7)
         if self.config["use_xformers"]:
             self.inpainting_pipeline.set_use_memory_efficient_attention_xformers(True)
 
-        mask_full = Image.new("RGB", (512, 512), "white")
-        # Use the non-inpainting model for first iteration
-        first_inpaint_pipeline = StableDiffusion3InpaintPipeline.from_pretrained(
-            self.config["stable_diffusion_checkpoint"],
-            safety_checker=None,
-            torch_dtype=torch.float32,
-            # revision="fp16",
-        )
-        first_inpaint_pipeline.scheduler = DPMSolverMultistepScheduler.from_config(
-            first_inpaint_pipeline.scheduler.config
-        )
-        # image = first_inpaint_pipeline(
-        first_inpaint_pipeline = first_inpaint_pipeline.to(self.device)
-        ip_adapter_image = Image.open("assets/1.jpg")
-        image = first_inpaint_pipeline(
-            # prompt=config["first_inpainting_prompt"],
-            prompt=self.config["inpainting_prompt"],
+        mask_full = Image.new("L", (512, 512), 255)  # greyscale mask
+        init_image = Image.new("RGB", (512, 512), "white")  # white image
+
+        output = self.inpainting_pipeline(
+            prompt=self.inpainting_prompt,
             negative_prompt=self.config["negative_inpainting_prompt"],
-            image=mask_full,
-            mask_image=mask_full,
+            control_image=init_image,  # PIL.Image (RGB)
+            control_mask=mask_full,
             num_inference_steps=self.config["num_inpainting_steps"],
             guidance_scale=self.config["classifier_free_guidance_scale"],
-            # ip_adapter_image=ip_adapter_image,
-        ).images[0]
+        )
+
+        image = output.images[0]
         self.image_tensor = ToTensor()(image).unsqueeze(0).to(self.device)
 
         self.depth_model = torch.hub.load("intel-isl/MiDaS", "DPT_Large").to(
@@ -838,18 +815,16 @@ class WarpInpaintModel(torch.nn.Module):
 
     @torch.no_grad()
     def inpaint(self, warped_image, inpaint_mask):
-        control_image = self.make_inpaint_condition(
-            ToPILImage()(warped_image[0]), ToPILImage()(inpaint_mask[0])
-        )
-        kernel = np.ones((5, 5), np.uint8)
-        mask = np.array(ToPILImage()(inpaint_mask[0]).convert("L")).astype(np.float32)
-        mask = cv2.dilate(mask, kernel, iterations=3)
-        ip_adapter_image = Image.open("assets/1.jpg")
-        inpainted_images = self.inpainting_pipeline(
+        # Prepare mask as PIL Image, 0=keep, 255=inpaint
+        mask_tensor = (inpaint_mask[0] > 0.5).mul(255).byte()
+        mask_pil = ToPILImage()(mask_tensor)
+        image_pil = ToPILImage()(warped_image[0])
+
+        output = self.inpainting_pipeline(
             prompt=self.inpainting_prompt,
             negative_prompt=self.config["negative_inpainting_prompt"],
-            image=ToPILImage()(warped_image[0]),
-            mask_image=ToPILImage()(mask),
+            control_image=image_pil,
+            control_mask=mask_pil,
             num_inference_steps=self.config["num_inpainting_steps"],
             callback_steps=self.config["num_inpainting_steps"] - 1,
             callback=self.latent_storer,
@@ -857,11 +832,10 @@ class WarpInpaintModel(torch.nn.Module):
             num_images_per_prompt=1,
             height=self.config["inpainting_resolution"],
             width=self.config["inpainting_resolution"],
-            control_image=control_image,
-            controlnet_conditioning_scale=1.0,
-            # ip_adapter_image=ip_adapter_image,
-        ).images
+            # control_image, controlnet_conditioning_scale, etc, if you use them
+        )
 
+        inpainted_images = output.images
         best_index = 0
         inpainted_image = inpainted_images[best_index]
         latent = self.latent_storer.latent[[best_index]]
