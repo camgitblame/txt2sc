@@ -11,3 +11,6 @@ wandb/
 .DS_Store
 *-output/
 *.ipynb
+activate_env.sh
+check_gpu.sh
+sd3con/
