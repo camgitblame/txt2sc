@@ -92,7 +92,6 @@ def save_video(video, path, fps=10):
     iio.imwrite(
         str(path),
         video_np,
-        format="mp4",
         fps=fps,
         codec="libx264",
         quality=8,  # Lower = better quality, larger file. 4-6 is common.
