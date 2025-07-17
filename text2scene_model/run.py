@@ -32,7 +32,9 @@ def evaluate(model):
         model.save_mesh("full_mesh")
 
     video = (255 * torch.cat(model.images, dim=0)).to(torch.uint8).detach().cpu()
-    video_reverse = (255 * torch.cat(model.images[::-1], dim=0)).to(torch.uint8).detach().cpu()
+    video_reverse = (
+        (255 * torch.cat(model.images[::-1], dim=0)).to(torch.uint8).detach().cpu()
+    )
 
     save_video(video, save_root / "output.mp4", fps=fps)
     save_video(video_reverse, save_root / "output_reverse.mp4", fps=fps)
@@ -51,9 +53,13 @@ def evaluate_epoch(model, epoch):
     (save_root / "disparities").mkdir(exist_ok=True, parents=True)
 
     ToPILImage()(model.images[epoch][0]).save(save_root / "frames" / f"{epoch}.png")
-    ToPILImage()(model.images_orig_decoder[epoch][0]).save(save_root / "images_orig_decoder" / f"{epoch}.png")
+    ToPILImage()(model.images_orig_decoder[epoch][0]).save(
+        save_root / "images_orig_decoder" / f"{epoch}.png"
+    )
     ToPILImage()(model.masks[epoch][0]).save(save_root / "masks" / f"{epoch}.png")
-    ToPILImage()(model.warped_images[epoch][0]).save(save_root / "warped_images" / f"{epoch}.png")
+    ToPILImage()(model.warped_images[epoch][0]).save(
+        save_root / "warped_images" / f"{epoch}.png"
+    )
     ToPILImage()(disparity_colored[0]).save(save_root / "disparities" / f"{epoch}.png")
 
     if epoch == 0:
@@ -64,57 +70,93 @@ def evaluate_epoch(model, epoch):
 def run(config):
     seed = config["seed"]
     if seed == -1:
-        seed = np.random.randint(2 ** 32)
+        seed = np.random.randint(2**32)
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
-    print(f"running with seed: {seed}.")
+    print(f"Running with seed: {seed}.")
     model = WarpInpaintModel(config).to(config["device"])
+    print("Model initialized")
     evaluate_epoch(model, 0)
+    print("Saved initial frame (epoch 0)")
     scaler = GradScaler(enabled=config["enable_mix_precision"])
     for epoch in tqdm(range(1, config["frames"] + 1)):
+        print(f"\n ===== Starting epoch {epoch} =====")
         if config["use_splatting"]:
+            print("Calling warp_splatting...")
             warp_output = model.warp_splatting(epoch)
+            print("Finished warp_splatting.")
         else:
+            print("Calling warp_mesh...")
             warp_output = model.warp_mesh(epoch)
+            print("Finished warp_mesh.")
 
-        inpaint_output = model.inpaint(warp_output["warped_image"], warp_output["inpaint_mask"])
+        print("Calling inpaint...")
+        inpaint_output = model.inpaint(
+            warp_output["warped_image"], warp_output["inpaint_mask"]
+        )
+        print("Finished inpaint.")
 
         if config["finetune_decoder"]:
+            print("Finetuning decoder...")
             finetune_decoder(config, model, warp_output, inpaint_output)
+            print("Finished finetune_decoder.")
 
         model.update_images_masks(inpaint_output["latent"], warp_output["inpaint_mask"])
+        print("Updated images and masks.")
 
         if config["finetune_depth_model"]:
+            print("Finetuning depth model...")
             # reload depth model
             del model.depth_model
             gc.collect()
             torch.cuda.empty_cache()
-            model.depth_model = torch.hub.load("intel-isl/MiDaS", "DPT_Large").to(model.device)
-
+            model.depth_model = torch.hub.load("intel-isl/MiDaS", "DPT_Large").to(
+                model.device
+            )
             finetune_depth_model(config, model, warp_output, epoch, scaler)
+            print("Finished finetune_depth_model.")
 
         model.update_depth(model.images[epoch])
+        print("Updated depth.")
 
         if not config["use_splatting"]:
             # update mesh with the correct mask
             if config["mask_opening_kernel_size"] > 0:
-                mesh_mask = 1 - torch.maximum(model.masks[epoch], model.masks_diffs[epoch - 1])
+                mesh_mask = 1 - torch.maximum(
+                    model.masks[epoch], model.masks_diffs[epoch - 1]
+                )
             else:
                 mesh_mask = 1 - model.masks[epoch]
             extrinsic = model.get_extrinsics(model.current_camera)
-            model.update_mesh(model.images[epoch], model.depths[epoch], mesh_mask > 0.5, extrinsic, epoch)
+            print("Updating mesh...")
+            model.update_mesh(
+                model.images[epoch],
+                model.depths[epoch],
+                mesh_mask > 0.5,
+                extrinsic,
+                epoch,
+            )
+            print("Finished update_mesh.")
 
         # reload decoder
         model.vae.decoder = copy.deepcopy(model.decoder_copy)
+        print("Reloaded VAE decoder")
 
-        model.images_orig_decoder.append(model.decode_latents(inpaint_output["latent"]).detach())
+        model.images_orig_decoder.append(
+            model.decode_latents(inpaint_output["latent"]).detach()
+        )
+        print("Appended decoded image")
         evaluate_epoch(model, epoch)
+        print(f"Saved results for epoch {epoch}")
 
         torch.cuda.empty_cache()
         gc.collect()
+        print("Emptied CUDA cache and garbage collected.")
 
+    print("Finished all epochs, evaluating model")
     evaluate(model)
+    print("All done!")
 
 
 if __name__ == "__main__":

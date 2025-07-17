@@ -11,6 +11,7 @@ import trimesh
 from PIL import Image
 from diffusers import (
     StableDiffusion3ControlNetInpaintingPipeline,
+    StableDiffusion3Pipeline,
     DPMSolverMultistepScheduler,
     AutoencoderKL,
     SD3ControlNetModel,
@@ -38,6 +39,7 @@ from util.midas_utils import dpt_transform
 
 class WarpInpaintModel(torch.nn.Module):
     def __init__(self, config):
+        self.size = config["inpainting_resolution"]
         super().__init__()
         if config["use_splatting"]:
             sys.path.append("util/softmax-splatting")
@@ -57,17 +59,18 @@ class WarpInpaintModel(torch.nn.Module):
         self.config = config
         self.inpainting_prompt = config["inpainting_prompt"]
 
+        # ====================== Pipeline Loading ======================
+
         controlnet = SD3ControlNetModel.from_pretrained(
             "../sd3con",
-            extra_conditioning_channels=1,
             torch_dtype=torch.float16,
         )
 
         self.inpainting_pipeline = (
             StableDiffusion3ControlNetInpaintingPipeline.from_pretrained(
                 self.config["stable_diffusion_checkpoint"],
-                controlnet=controlnet,
                 torch_dtype=torch.float16,
+                controlnet=controlnet,
             )
         )
 
@@ -75,24 +78,33 @@ class WarpInpaintModel(torch.nn.Module):
             self.inpainting_pipeline.scheduler.config
         )
         self.inpainting_pipeline = self.inpainting_pipeline.to(self.device)
+
         if self.config["use_xformers"]:
             self.inpainting_pipeline.set_use_memory_efficient_attention_xformers(True)
 
-        mask_full = Image.new("L", (512, 512), 255)  # greyscale mask
-        init_image = Image.new("RGB", (512, 512), "white")  # white image
+        # ====================== Initial Image Generation ======================
+        # Use the DreamBooth SD3 pipeline for the first image generation (text-to-image, no mask)
+        first_txt2img_pipeline = StableDiffusion3Pipeline.from_pretrained(
+            self.config["stable_diffusion_checkpoint"], torch_dtype=torch.float16
+        ).to(self.device)
 
-        output = self.inpainting_pipeline(
-            prompt=self.inpainting_prompt,
-            negative_prompt=self.config["negative_inpainting_prompt"],
-            control_image=init_image,  # PIL.Image (RGB)
-            control_mask=mask_full,
-            num_inference_steps=self.config["num_inpainting_steps"],
-            guidance_scale=self.config["classifier_free_guidance_scale"],
+        generator = torch.Generator(device=self.device).manual_seed(
+            self.config.get("seed", 42)
         )
 
-        image = output.images[0]
+        image = first_txt2img_pipeline(
+            prompt=self.config["inpainting_prompt"],
+            negative_prompt=self.config.get("negative_inpainting_prompt", None),
+            num_inference_steps=self.config["num_inpainting_steps"],
+            guidance_scale=self.config["classifier_free_guidance_scale"],
+            generator=generator,
+            height=self.size,
+            width=self.size,
+        ).images[0]
         self.image_tensor = ToTensor()(image).unsqueeze(0).to(self.device)
 
+        # ====================== Depth Estimation ======================
+        # Use MiDaS for monocular depth estimation
         self.depth_model = torch.hub.load("intel-isl/MiDaS", "DPT_Large").to(
             self.device
         )
@@ -100,6 +112,7 @@ class WarpInpaintModel(torch.nn.Module):
         with torch.no_grad():
             self.depth, self.disparity = self.get_depth(self.image_tensor)
 
+        # ====================== Camera Initialization ======================
         self.current_camera = self.get_init_camera()
         if self.config["motion"] == "round":
             self.initial_median_depth = torch.median(self.depth).item()
@@ -189,36 +202,7 @@ class WarpInpaintModel(torch.nn.Module):
         ]
 
         assert self.config["inpainting_resolution"] >= 512
-        # create mask for inpainting of the right size, white area around the image in the middle
-        self.border_mask = torch.ones(
-            (
-                1,
-                1,
-                self.config["inpainting_resolution"],
-                self.config["inpainting_resolution"],
-            )
-        ).to(self.device)
-        self.border_size = (self.config["inpainting_resolution"] - 512) // 2
-        self.border_mask[
-            :,
-            :,
-            self.border_size : -self.border_size,
-            self.border_size : -self.border_size,
-        ] = 0
-        self.border_image = torch.zeros(
-            1,
-            3,
-            self.config["inpainting_resolution"],
-            self.config["inpainting_resolution"],
-        ).to(self.device)
-        self.images_orig_decoder = [
-            Resize(
-                (
-                    self.config["inpainting_resolution"],
-                    self.config["inpainting_resolution"],
-                )
-            )(self.image_tensor)
-        ]
+        self.images_orig_decoder = [Resize((self.size, self.size))(self.image_tensor)]
 
         boundaries_mask = self.get_boundaries_mask(self.disparity)
 
@@ -226,18 +210,21 @@ class WarpInpaintModel(torch.nn.Module):
 
         mesh_mask = torch.zeros_like(boundaries_mask)
         if self.config["use_splatting"]:
-            x = torch.arange(512)
-            y = torch.arange(512)
+            x = torch.arange(self.size)
+            y = torch.arange(self.size)
             self.points = torch.stack(torch.meshgrid(x, y), -1)
             self.points = rearrange(self.points, "h w c -> (h w) c").to(self.device)
         else:
             aa_factor = self.config["antialiasing_factor"]
-            self.renderer = Renderer(config, image_size=512)
+
+            self.renderer = Renderer(config, image_size=self.size)
             self.aa_renderer = Renderer(
-                config, image_size=512 * aa_factor, antialiasing_factor=aa_factor
+                config, image_size=self.size * aa_factor, antialiasing_factor=aa_factor
             )
             self.big_image_renderer = Renderer(
-                config, image_size=512 * (aa_factor + 1), antialiasing_factor=aa_factor
+                config,
+                image_size=self.size * (aa_factor + 1),
+                antialiasing_factor=aa_factor,
             )
             self.update_mesh(
                 self.image_tensor,
@@ -433,14 +420,19 @@ class WarpInpaintModel(torch.nn.Module):
         K = torch.zeros((1, 4, 4), device=self.device)
         K[0, 0, 0] = self.config["init_focal_length"]
         K[0, 1, 1] = self.config["init_focal_length"]
-        K[0, 0, 2] = 256
-        K[0, 1, 2] = 256
+        K[0, 0, 2] = self.size // 2
+        K[0, 1, 2] = self.size // 2
         K[0, 2, 3] = 1
         K[0, 3, 2] = 1
         R = torch.eye(3, device=self.device).unsqueeze(0)
         T = torch.zeros((1, 3), device=self.device)
         camera = PerspectiveCameras(
-            K=K, R=R, T=T, in_ndc=False, image_size=((512, 512),), device=self.device
+            K=K,
+            R=R,
+            T=T,
+            in_ndc=False,
+            image_size=((self.size, self.size),),
+            device=self.device,
         )
         return camera
 
@@ -486,7 +478,7 @@ class WarpInpaintModel(torch.nn.Module):
         transformed_z = transformed_points[:, [2]]
         points_2d = convert_points_from_homogeneous(transformed_points)
         flow = points_2d - self.points
-        flow_tensor = rearrange(flow, "(w h b) c -> b c h w", w=512, h=512)
+        flow_tensor = rearrange(flow, "(w h b) c -> b c h w", w=self.size, h=self.size)
 
         importance = 1.0 / (transformed_z)
         importance_min = importance.amin(keepdim=True)
@@ -494,10 +486,10 @@ class WarpInpaintModel(torch.nn.Module):
         weights = (importance - importance_min) / (
             importance_max - importance_min + 1e-6
         ) * 20 - 10
-        weights = rearrange(weights, "(w h b) c -> b c h w", w=512, h=512)
+        weights = rearrange(weights, "(w h b) c -> b c h w", w=self.size, h=self.size)
 
         transformed_z_tensor = rearrange(
-            transformed_z, "(w h b) c -> b c h w", w=512, h=512
+            transformed_z, "(w h b) c -> b c h w", w=self.size, h=self.size
         )
         inpaint_mask = torch.ones_like(transformed_z_tensor)
         boundaries_mask = self.get_boundaries_mask(self.disparities[epoch - 1])
@@ -535,24 +527,8 @@ class WarpInpaintModel(torch.nn.Module):
         self.cameras.append(self.current_camera)
         self.warped_images.append(warped_image)
 
-        if self.config["inpainting_resolution"] > 512:
-            padded_inpainting_mask = self.border_mask.clone()
-            padded_inpainting_mask[
-                :,
-                :,
-                self.border_size : -self.border_size,
-                self.border_size : -self.border_size,
-            ] = inpaint_mask
-            padded_image = self.border_image.clone()
-            padded_image[
-                :,
-                :,
-                self.border_size : -self.border_size,
-                self.border_size : -self.border_size,
-            ] = warped_image
-        else:
-            padded_inpainting_mask = inpaint_mask
-            padded_image = warped_image
+        padded_inpainting_mask = inpaint_mask
+        padded_image = warped_image
 
         return {
             "warped_image": padded_image,
@@ -602,8 +578,10 @@ class WarpInpaintModel(torch.nn.Module):
             self.aa_renderer.renderer.rasterizer.raster_settings.blur_radius = (
                 self.config["blur_radius"]
             )
-        big_resolution = (self.config["antialiasing_factor"] + 1) * 512
-        border_size = (big_resolution - self.config["antialiasing_factor"] * 512) // 2
+        big_resolution = (self.config["antialiasing_factor"] + 1) * self.size
+        border_size = (
+            big_resolution - self.config["antialiasing_factor"] * self.size
+        ) // 2
         pad_value = 0
         big_image = F.pad(
             prev_image,
@@ -736,24 +714,8 @@ class WarpInpaintModel(torch.nn.Module):
         self.cameras_extrinsics.append(self.get_extrinsics(self.current_camera).cpu())
         self.cameras.append(self.current_camera)
 
-        if self.config["inpainting_resolution"] > 512:
-            padded_inpainting_mask = self.border_mask.clone()
-            padded_inpainting_mask[
-                :,
-                :,
-                self.border_size : -self.border_size,
-                self.border_size : -self.border_size,
-            ] = inpaint_mask
-            padded_image = self.border_image.clone()
-            padded_image[
-                :,
-                :,
-                self.border_size : -self.border_size,
-                self.border_size : -self.border_size,
-            ] = warped_image
-        else:
-            padded_inpainting_mask = inpaint_mask
-            padded_image = warped_image
+        padded_inpainting_mask = inpaint_mask
+        padded_image = warped_image
 
         return {
             "warped_image": padded_image,
@@ -768,11 +730,11 @@ class WarpInpaintModel(torch.nn.Module):
         extrinsics = torch.eye(4, device=R.device).unsqueeze(0)
         extrinsics[:, :3, :3] = R
         extrinsics[:, :3, 3] = T
-        h = torch.tensor([512], device="cuda")
-        w = torch.tensor([512], device="cuda")
+        h = torch.tensor([self.size], device="cuda")
+        w = torch.tensor([self.size], device="cuda")
         K = torch.eye(4)[None].to("cuda")
-        K[0, 0, 2] = 256
-        K[0, 1, 2] = 256
+        K[0, 0, 2] = self.size // 2
+        K[0, 1, 2] = self.size // 2
         K[0, 0, 0] = self.config["init_focal_length"]
         K[0, 1, 1] = self.config["init_focal_length"]
         return PinholeCamera(K, extrinsics, h, w)
@@ -815,29 +777,36 @@ class WarpInpaintModel(torch.nn.Module):
 
     @torch.no_grad()
     def inpaint(self, warped_image, inpaint_mask):
-        # Prepare mask as PIL Image, 0=keep, 255=inpaint
-        mask_tensor = (inpaint_mask[0] > 0.5).mul(255).byte()
-        mask_pil = ToPILImage()(mask_tensor)
+        # Convert tensor images to PIL images for image + mask
         image_pil = ToPILImage()(warped_image[0])
+        mask_np = np.array(ToPILImage()(inpaint_mask[0]).convert("L")).astype(
+            np.float32
+        )
 
-        output = self.inpainting_pipeline(
+        # Expand the inpainting mask by dilation to improve edge blending
+        kernel = np.ones((5, 5), np.uint8)
+        mask_dilated = cv2.dilate(mask_np, kernel, iterations=3)
+        mask_pil = Image.fromarray(mask_dilated.astype(np.uint8))
+
+        # Run inpainting pipeline call
+        result = self.inpainting_pipeline(
             prompt=self.inpainting_prompt,
             negative_prompt=self.config["negative_inpainting_prompt"],
             control_image=image_pil,
             control_mask=mask_pil,
             num_inference_steps=self.config["num_inpainting_steps"],
-            callback_steps=self.config["num_inpainting_steps"] - 1,
-            callback=self.latent_storer,
             guidance_scale=self.classifier_free_guidance_scale,
             num_images_per_prompt=1,
             height=self.config["inpainting_resolution"],
             width=self.config["inpainting_resolution"],
-            # control_image, controlnet_conditioning_scale, etc, if you use them
+            controlnet_conditioning_scale=1.0,
+            callback_on_step_end=self.latent_storer,
+            callback_on_step_end_tensor_inputs=["latents"],
         )
 
-        inpainted_images = output.images
+        # Get results
         best_index = 0
-        inpainted_image = inpainted_images[best_index]
+        inpainted_image = result.images[best_index]
         latent = self.latent_storer.latent[[best_index]]
         inpainted_image = ToTensor()(inpainted_image).unsqueeze(0).to(self.device)
         latent = latent.float()
@@ -856,24 +825,6 @@ class WarpInpaintModel(torch.nn.Module):
 
     def update_images_masks(self, latent, inpaint_mask):
         decoded_image = self.decode_latents(latent).detach()
-        # take center crop of 512*512
-        if self.config["inpainting_resolution"] > 512:
-            decoded_image = decoded_image[
-                :,
-                :,
-                self.border_size : -self.border_size,
-                self.border_size : -self.border_size,
-            ]
-            inpaint_mask = inpaint_mask[
-                :,
-                :,
-                self.border_size : -self.border_size,
-                self.border_size : -self.border_size,
-            ]
-        else:
-            decoded_image = decoded_image
-            inpaint_mask = inpaint_mask
-
         self.images.append(decoded_image)
         self.masks.append(inpaint_mask)
 

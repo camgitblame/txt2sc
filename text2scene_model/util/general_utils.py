@@ -2,7 +2,9 @@ import kornia
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
-from torchvision.io import write_video
+import imageio.v3 as iio
+
+# from torchvision.io import write_video
 
 
 def tensor2im(input_image, imtype=np.uint8):
@@ -26,8 +28,10 @@ class LatentStorer:
     def __init__(self):
         self.latent = None
 
-    def __call__(self, i, t, latent):
-        self.latent = latent
+    def __call__(self, pipeline, step, timestep, tensors):
+        # 'tensors' is a dict, e.g. {"latents": tensor}
+        self.latent = tensors["latents"].detach().to(pipeline.device)
+        return {}  # must return a dict, can update latents etc. if desired
 
 
 def sobel_filter(disp, mode="sobel", beta=10.0):
@@ -68,13 +72,28 @@ def apply_depth_colormap(
     return colored_image
 
 
+# def save_video(video, path, fps=10):
+#     video = video.permute(0, 2, 3, 1)
+#     video_codec = "libx264"
+#     video_options = {
+#         "crf": "23",  # Constant Rate Factor (lower value = higher quality, 18 is a good balance)
+#         "preset": "slow",
+#     }
+#     write_video(
+#         str(path), video, fps=fps, video_codec=video_codec, options=video_options
+#     )
+
+
 def save_video(video, path, fps=10):
-    video = video.permute(0, 2, 3, 1)
-    video_codec = "libx264"
-    video_options = {
-        "crf": "23",  # Constant Rate Factor (lower value = higher quality, 18 is a good balance)
-        "preset": "slow",
-    }
-    write_video(
-        str(path), video, fps=fps, video_codec=video_codec, options=video_options
+    video_np = video.permute(0, 2, 3, 1).cpu().numpy()
+    # Convert to uint8 if necessary
+    if video_np.dtype != "uint8":
+        video_np = (video_np * 255).clip(0, 255).astype("uint8")
+    iio.imwrite(
+        str(path),
+        video_np,
+        format="mp4",
+        fps=fps,
+        codec="libx264",
+        quality=8,  # Lower = better quality, larger file. 4-6 is common.
     )
