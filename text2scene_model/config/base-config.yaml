@@ -41,7 +41,7 @@ preservation_weight: 100
 
 num_inpainting_steps: 50
 classifier_free_guidance_scale: 7.5
-inpainting_resolution: 600
+inpainting_resolution: 1024
 
 #depth finetuning parameters
 finetune_depth_model: True

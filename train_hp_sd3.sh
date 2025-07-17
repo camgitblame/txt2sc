@@ -19,7 +19,7 @@ accelerate launch train_dreambooth_sd3.py \
   --output_dir="hp/hp-sd3" \
   --mixed_precision="fp16" \
   --instance_prompt="a photo of hph harrypotter" \
-  --resolution=512 \
+  --resolution=1024 \
   --train_batch_size=1 \
   --gradient_accumulation_steps=1 \
   --learning_rate=5e-6 \
@@ -30,4 +30,4 @@ accelerate launch train_dreambooth_sd3.py \
   --resume_from_checkpoint=latest \
   --max_sequence_length=128 \
   --push_to_hub \
-  --hub_model_id $HF_MODEL_ID
+  --hub_model_id $HF_MODEL_ID 

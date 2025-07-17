@@ -3,7 +3,7 @@ from diffusers import StableDiffusion3Pipeline
 from PIL import Image
 
 
-def image_grid(imgs, rows, cols, resize=256):
+def image_grid(imgs, rows, cols, resize=None):
     if resize is not None:
         imgs = [img.resize((resize, resize)) for img in imgs]
     w, h = imgs[0].size
