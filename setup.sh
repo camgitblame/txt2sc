@@ -32,7 +32,7 @@ pip install --proxy $https_proxy -r requirements_dreambooth.txt
 
 
 # === INSTALL TORCH (CUDA) ===
-pip install --proxy $https_proxy torch torchvision --index-url https://download.pytorch.org/whl/cu118
+pip install --proxy $https_proxy torch torchvision --index-url https://download.pytorch.org/whl/cu121
 
 # === CHECK PYTHON ENV ===
 echo "Python and pip versions:"
