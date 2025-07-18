@@ -5,7 +5,7 @@ Stylized, depth-consistent 3D scene generation for movies from text prompts, usi
 
 ## Setup
 
-- Clone this repository and navigate to the project directory.
+- Clone the repository and navigate to the project directory.
 
 - Run `setup.sh` to set up your environment and required modules, install all dependencies and configure network proxies for cluster access.
 
