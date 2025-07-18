@@ -14,3 +14,8 @@ wandb/
 activate_env.sh
 check_gpu.sh
 sd3con/
+cuda related/check_cuda copy.py
+cuda related/check_cuda.py
+cuda related/check_cuda.sh
+install-pytorch.sh
+setup_env.sh
