@@ -4,11 +4,7 @@ source /opt/flight/etc/setup.sh
 flight env activate gridware
 module load gnu
 module load compilers/gcc
-<<<<<<< HEAD
 module load libs/nvidia-cuda/12.2.2/bin  
-=======
-module load libs/nvidia-cuda/12.2.0/bin  
->>>>>>> parent of 66b5378 (Delete setup.sh)
 
 # === PROXY ===
 export https_proxy=http://hpc-proxy00.city.ac.uk:3128
@@ -34,14 +30,9 @@ python --version
 # === INSTALL REQUIREMENTS ===
 pip install --proxy $https_proxy -r requirements_dreambooth.txt
 
-<<<<<<< HEAD
 
 # === INSTALL TORCH (CUDA) ===
 pip install --proxy $https_proxy torch torchvision --index-url https://download.pytorch.org/whl/cu118
-=======
-# === INSTALL TORCH (CUDA) ===
-pip install --proxy $https_proxy torch torchvision --index-url https://download.pytorch.org/whl/cu121
->>>>>>> parent of 66b5378 (Delete setup.sh)
 
 # === CHECK PYTHON ENV ===
 echo "Python and pip versions:"
@@ -50,13 +41,8 @@ which pip
 pip list --format=columns
 
 # === Login to wandb ===
-<<<<<<< HEAD
 export WANDB_API_KEY= wandb_key
 wandb login $WANDB_API_KEY --relogin
 
 # === Login to Hugging Hace ===
 huggingface-cli login --token hf_token
-=======
-export WANDB_API_KEY= wandb_key
-wandb login $WANDB_API_KEY --relogin
->>>>>>> parent of 66b5378 (Delete setup.sh)
