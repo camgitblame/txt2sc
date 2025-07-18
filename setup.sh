@@ -4,7 +4,7 @@ source /opt/flight/etc/setup.sh
 flight env activate gridware
 module load gnu
 module load compilers/gcc
-module load libs/nvidia-cuda/11.2.0/bin  
+module load libs/nvidia-cuda/12.2.0/bin  
 
 # === PROXY ===
 export https_proxy=http://hpc-proxy00.city.ac.uk:3128
@@ -28,12 +28,10 @@ pip install --upgrade pip setuptools wheel
 python --version
 
 # === INSTALL REQUIREMENTS ===
-if [ -f requirements.txt ]; then
-    pip install --proxy $https_proxy -r requirements_dreambooth.txt
-fi
+pip install --proxy $https_proxy -r requirements_dreambooth.txt
 
 # === INSTALL TORCH (CUDA) ===
-pip install --proxy $https_proxy torch torchvision --index-url https://download.pytorch.org/whl/cu118
+pip install --proxy $https_proxy torch torchvision --index-url https://download.pytorch.org/whl/cu121
 
 # === CHECK PYTHON ENV ===
 echo "Python and pip versions:"
@@ -42,5 +40,5 @@ which pip
 pip list --format=columns
 
 # === Login to wandb ===
-export WANDB_API_KEY=f1b1dcb5ebf893b856630d4481b7d7cd05101b45
+export WANDB_API_KEY= wandb_key
 wandb login $WANDB_API_KEY --relogin
