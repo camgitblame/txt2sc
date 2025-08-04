@@ -9,7 +9,7 @@ Stylized, depth-consistent 3D scene generation for movies from text prompts, usi
 
 - Run `setup.sh` to set up your environment and required modules, install all dependencies and configure network proxies for cluster access.
 
-- Update `wandb_key` and `hf_token` in the script with your credentials to log into wandb and HuggingFace.
+- Update `wandb_key` and `hf_token` in the script to log into wandb and HuggingFace.
 
 
 ```bash
