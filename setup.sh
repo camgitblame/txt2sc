@@ -28,7 +28,7 @@ pip install --upgrade pip setuptools wheel
 python --version
 
 # === INSTALL REQUIREMENTS ===
-pip install --proxy $https_proxy -r requirements_dreambooth.txt
+pip install --proxy $https_proxy -r requirements.txt
 
 
 # === INSTALL TORCH (CUDA) ===

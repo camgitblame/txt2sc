@@ -1,7 +1,6 @@
 txt2sc/
 website/
 stable-diffusion/
-SceneScape/
 LoRA/
 data/
 sd3/
@@ -19,3 +18,11 @@ cuda related/check_cuda.py
 cuda related/check_cuda.sh
 install-pytorch.sh
 setup_env.sh
+StyleScape/
+mask/
+warp_images/
+output/
+text
+text2scene_model/
+model_ref/
+Style/

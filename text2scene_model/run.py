@@ -5,6 +5,9 @@ from argparse import ArgumentParser
 from pathlib import Path
 
 import numpy as np
+import os
+
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 import torch
 from omegaconf import OmegaConf
 from torch.cuda.amp import GradScaler
@@ -74,6 +77,7 @@ def run(config):
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
+    torch.backends.cudnn.benchmark = True
     print(f"Running with seed: {seed}.")
     model = WarpInpaintModel(config).to(config["device"])
     print("Model initialized")

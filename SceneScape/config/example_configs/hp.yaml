@@ -1,0 +1,5 @@
+runs_dir: output
+seed: 13
+frames: 10
+
+inpainting_prompt: "POV, walkthrough, the great hall from harry potter, masterpiece, indoor scene, best quality"
