@@ -2,14 +2,11 @@
 WarpInpaintModel adapted for Stable Diffusion 3 with Whitecast Fix
 ================================================================
 
-This file is an adaptation of warp_inpaint_model_og.py to work with SD3 instead of SD1.5.
-The main adaptation was necessary to solve the "whitecast" problem where white/bright areas
+This is an adaptation of Scene Scape to work with SD3 instead of SD1.5.
+We also solved the "whitecast" problem where white/bright areas
 from mesh warping artifacts would propagate and dominate subsequent video frames.
 
-Key adaptation areas marked with "ADAPTATION CHANGE:" comments throughout the code.
-
-Original SD1.5 version: warp_inpaint_model_og.py
-Adapted SD3 version: warp_inpaint_model_SD3_whitecast.py (this file)
+Key changes are marked with "ADAPTATION CHANGE:" comments throughout the code.
 """
 
 import copy
@@ -94,13 +91,11 @@ class WarpInpaintModel(torch.nn.Module):
        - Added bypass for latent encoding/decoding when possible
        - Reduces quality loss in SD3 pipeline
 
-    8. DEBUG CAPABILITIES:
+    8. DEBUG IMAGES SAVING:
        - Comprehensive debug image saving
        - White area visualization for troubleshooting
        - Mask overlay visualization
 
-    The main goal was to eliminate the "whitecast" issue where white/bright areas
-    in mesh warping would propagate and dominate the generated video frames.
     """
 
     def __init__(self, config):
