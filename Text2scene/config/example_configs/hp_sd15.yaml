@@ -1,7 +1,0 @@
-runs_dir: output
-seed: 13
-frames: 10
-
-stable_diffusion_checkpoint: "emily49/harry-potter-stable-diffusion-non-inpaint-1-5" 
-
-inpainting_prompt: "POV, walkthrough, castle from sks harrypotter, masterpiece, indoor scene, best quality"
