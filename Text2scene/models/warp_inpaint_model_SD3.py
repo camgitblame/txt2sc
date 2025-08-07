@@ -1,5 +1,5 @@
 """
-WarpInpaintModel adapted for Stable Diffusion 3 (from Scene Scape)
+WarpInpaintModel (from Scene Scape) adapted for Stable Diffusion 3
 ===================================================================
 This is an adaptation of the original Scene Scape pipleine's WarpInpaintModel to support SD3 instead of SD1.5.
 It includes updates for SD3 compatibility and fixes for whitecast issues caused by mesh warping.

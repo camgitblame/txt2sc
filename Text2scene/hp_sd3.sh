@@ -13,4 +13,4 @@
 # Set environment variable to suppress tokenizers warning
 export TOKENIZERS_PARALLELISM=false
 
-python run.py --base-config ./config/base-config_sd3.yaml --example_config ./config/example_configs/hp_512.yaml
+python run.py --base-config ./config/base-config_sd3.yaml --example_config ./config/example_configs/hp_sd3.yaml

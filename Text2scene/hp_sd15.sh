@@ -10,4 +10,4 @@
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
 
-python run.py --base-config ./config/base-config.yaml --example_config ./config/example_configs/hp.yaml
+python run.py --base-config ./config/base-config.yaml --example_config ./config/example_configs/hp_sd15.yaml
