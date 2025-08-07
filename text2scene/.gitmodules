@@ -1,3 +1,0 @@
-[submodule "util/softmax-splatting"]
-	path = util/softmax-splatting
-	url = https://github.com/sniklaus/softmax-splatting.git
