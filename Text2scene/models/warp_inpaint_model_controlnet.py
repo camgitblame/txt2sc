@@ -1,15 +1,8 @@
 """
-WarpInpaintModel with DreamBooth Non-Inpainting Model Integration and ControlNet Support
+WarpInpaintModel with DreamBooth Non-Inpainting Model and ControlNet
 
-This module has been enhanced to support DreamBooth models that were NOT trained for inpainting
-(standard text-to-image DreamBooth models) while still providing inpainting capabilities through
-ControlNet integration and hybrid pipeline approaches.
-
-KEY FEATURES ADDED:
-1. Support for DreamBooth non-inpainting models ("camgitblame/american_psycho_sd15")
-2. Hybrid approach: Base SD1.5 inpainting + DreamBooth UNet replacement
-3. ControlNet integration for enhanced structural consistency
-4. Smart fallback mechanisms for different model types
+Support DreamBooth models that were NOT trained for inpainting while still providing
+inpainting capabilities through ControlNet integration and hybrid pipeline approaches.
 
 CONFIG OPTIONS:
 - stable_diffusion_checkpoint: Path to DreamBooth model (inpainting OR non-inpainting)

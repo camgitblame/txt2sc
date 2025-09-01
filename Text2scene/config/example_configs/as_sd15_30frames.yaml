@@ -7,7 +7,7 @@ seed: 13
 frames: 30  
 
 # DreamBooth Model Configuration 
-stable_diffusion_checkpoint: "camgitblame/american_psycho_sd15"
+stable_diffusion_checkpoint: "camgitblame/american_psycho_sd15_1500"
 use_dreambooth_unet: true  # Enable hybrid approach for non-inpainting DreamBooth model
 
 # ControlNet Configuration 
@@ -18,8 +18,10 @@ classifier_free_guidance_scale: 8.0  # Stronger prompt adherence
 
 # Scene Prompting
 inpainting_prompt: "POV, walkthrough, Patrick Bateman's luxury apartment from sks americanpsycho, consistent lighting, architectural photography, modern minimalist interior, masterpiece, indoor scene, best quality"
+negative_inpainting_prompt: "blurry, distorted geometry, warped perspective, floating objects, inconsistent depth, geometric artifacts, deformed architecture"
 # SPEED OPTIMIZATIONS
 num_inpainting_steps: 35  
+inpainting_resolution: 600
 use_xformers: true  # ENABLED: Better memory efficiency and speed
 enable_mix_precision: false  # DISABLED: Prevent data type conflicts with DreamBooth
 finetune_decoder: false  # DISABLED: Skip decoder finetuning for speed
