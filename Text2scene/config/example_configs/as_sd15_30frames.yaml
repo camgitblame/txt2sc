@@ -1,0 +1,26 @@
+# SPEED-OPTIMIZED COMPARISON: DreamBooth + ControlNet vs SceneScape Baseline
+# FAST TEST: 30-frame generation with finetuning disabled for speed
+# ONLY DIFFERENCES: DreamBooth model + ControlNet integration
+
+runs_dir: output
+seed: 13
+frames: 30  
+
+# DreamBooth Model Configuration 
+stable_diffusion_checkpoint: "camgitblame/american_psycho_sd15"
+use_dreambooth_unet: true  # Enable hybrid approach for non-inpainting DreamBooth model
+
+# ControlNet Configuration 
+use_controlnet: true  # Enable ControlNet for better geometry preservation
+controlnet_model: "lllyasviel/control_v11p_sd15_inpaint"  # Inpainting-specific ControlNet
+controlnet_conditioning_scale: 0.8  # Full structural consistency
+classifier_free_guidance_scale: 8.0  # Stronger prompt adherence
+
+# Scene Prompting
+inpainting_prompt: "POV, walkthrough, Patrick Bateman's luxury apartment from sks americanpsycho, consistent lighting, architectural photography, modern minimalist interior, masterpiece, indoor scene, best quality"
+# SPEED OPTIMIZATIONS
+num_inpainting_steps: 35  
+use_xformers: true  # ENABLED: Better memory efficiency and speed
+enable_mix_precision: false  # DISABLED: Prevent data type conflicts with DreamBooth
+finetune_decoder: false  # DISABLED: Skip decoder finetuning for speed
+finetune_depth_model: false  # DISABLED: Skip depth model finetuning for speed
