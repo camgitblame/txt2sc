@@ -1,17 +1,12 @@
 # warp_fix.py
 """
-Fast-impact geometry fixes for WarpInpaintModel (no core rewrite).
+Improving geometric consistency and adding multi-ControlNet setup for WarpInpaintModel.
 
-What this adds:
-1) Mesh accumulation after each inpaint
-2) Optional multi-ControlNet (add Depth CN alongside Inpaint CN)
-3) Conservative inpaint (smaller mask + lower denoise strength + deterministic seed)
-4) Temporal depth smoothing (EMA)
-5) Motion warmup (smaller camera steps early, optional)
-
-Usage (runner or after constructing the model):
-    from warp_fix import attach_fast_fixes
-    attach_fast_fixes(model, config_overrides={...})
+- Mesh accumulation after each inpaint
+- Multi ControlNet: Add Depth CN alongside Inpaint CN
+- Conservative inpaint (smaller mask + lower denoise strength + seed)
+- Temporal depth smoothing (EMA)
+- Motion warmup (smaller camera steps early)
 """
 
 from typing import Optional, Dict, Any, List
@@ -23,7 +18,7 @@ from PIL import Image
 from torchvision.transforms import ToTensor, ToPILImage
 from torchvision.transforms import ToPILImage
 
-# ---- defaults you can override via `config_overrides` ----
+# ---- defaults can be overridden via `config_overrides` ----
 DEFAULTS = {
     "fix_enable_mesh_accumulation": True,
     "fix_enable_depth_controlnet": True,  # requires diffusers ControlNet weights
@@ -91,7 +86,7 @@ def attach_fast_fixes(model, config_overrides: Optional[Dict[str, Any]] = None):
     if config_overrides:
         cfg.update(config_overrides)
 
-    # -------------- (5) Motion warmup helpers --------------
+    # -------------- Motion warmup helpers --------------
     model._fix_base_speed = float(model.camera_speed_factor)
     model._fix_motion_warmup_ratio = float(cfg["fix_motion_warmup_ratio"])
     model._fix_motion_warmup_scale = float(cfg["fix_motion_warmup_scale"])
@@ -108,7 +103,7 @@ def attach_fast_fixes(model, config_overrides: Optional[Dict[str, Any]] = None):
 
     model.apply_motion_schedule = types.MethodType(apply_motion_schedule, model)
 
-    # -------------- (4) Patch update_depth with EMA --------------
+    # -------------- Update depth with EMA --------------
     model._orig_update_depth = model.update_depth
     alpha = float(cfg["fix_depth_ema_alpha"])
 
@@ -122,7 +117,7 @@ def attach_fast_fixes(model, config_overrides: Optional[Dict[str, Any]] = None):
 
     model.update_depth = types.MethodType(update_depth_ema, model)
 
-    # -------------- (1) Accumulate mesh after inpaint --------------
+    # -------------- Accumulate mesh after inpaint --------------
     def accumulate_mesh_after_inpaint(self, inpainted_image, inpaint_mask, epoch: int):
         if not cfg["fix_enable_mesh_accumulation"]:
             return
@@ -137,7 +132,7 @@ def attach_fast_fixes(model, config_overrides: Optional[Dict[str, Any]] = None):
             self.update_mesh(
                 inpainted_image,
                 new_depth,
-                mask_bool,  # treat True=exclude -> pass where we DON'T want to keep? (your update_mesh sets updated_depth[mask]=-1)
+                mask_bool,
                 self.get_extrinsics(self.current_camera),
                 epoch,
             )
@@ -155,7 +150,7 @@ def attach_fast_fixes(model, config_overrides: Optional[Dict[str, Any]] = None):
         accumulate_mesh_after_inpaint, model
     )
 
-    # -------------- (2) Optional: add Depth ControlNet --------------
+    # -------------- Add Depth ControlNet --------------
     model._fix_depth_controlnet_enabled = False
     if getattr(model, "use_controlnet", False) and cfg["fix_enable_depth_controlnet"]:
         try:
@@ -165,7 +160,7 @@ def attach_fast_fixes(model, config_overrides: Optional[Dict[str, Any]] = None):
                 f"[warp_fix] Depth ControlNet not enabled ({e}). Continuing without multi-ControlNet."
             )
 
-    # -------------- (3) Patch inpaint to shrink mask + strength + deterministic seed --------------
+    # -------------- Patch inpaint to shrink mask + strength + deterministic seed --------------
     model._orig_inpaint = model.inpaint
     seed = cfg["fix_seed"]
     if seed is None:
@@ -194,7 +189,7 @@ def attach_fast_fixes(model, config_overrides: Optional[Dict[str, Any]] = None):
             mask = cv2.dilate(mask, kernel, iterations=3)
             mask_pil = Image.fromarray(mask).convert("L")
 
-            # Check if control_image is a list and handle appropriately
+            # Check if control_image is a list and handle accordingly
             if isinstance(control_image, list):
                 control_image_input = control_image
             else:
