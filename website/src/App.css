@@ -1,0 +1,35 @@
+.ant-carousel .slick-dots li button {
+  background: #000000;
+  opacity: 0.4;
+  /* width: 6px;
+  height: 6px; */
+  /* border-radius: 100%; */
+}
+
+.ant-carousel .slick-dots li.slick-active button {
+  opacity: 1;
+  background: #000000;
+  /* width: 7px;
+  height: 7px; */
+  /* border-radius: 100%; */
+}
+
+.ant-carousel .slick-next {
+  opacity: 0.4;
+  color: #000000;
+}
+
+.ant-carousel .slick-next li.slick-active {
+  opacity: 1;
+  color: #000000;
+}
+
+.ant-carousel .slick-prev {
+  opacity: 0.4;
+  color: #000000;
+}
+
+.ant-carousel .slick-prev li.slick-active {
+  opacity: 1;
+  color: #000000;
+}
