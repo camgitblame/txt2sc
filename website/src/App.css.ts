@@ -2,88 +2,103 @@ import { style } from "@vanilla-extract/css";
 
 export const app = style({
   textAlign: "center",
-  paddingTop: "2em",
+  backgroundColor: "#282c34",
+  color: "white",
+  minHeight: "100vh",
+  padding: "20px",
+  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
 });
 
 export const nameContainer = style({
   display: "flex",
   justifyContent: "center",
-  alignItems: "center",
-  flexDirection: "row",
-  "@media": {
-    "(max-width: 800px)": {
-      flexDirection: "column",
-    },
-  },
+  margin: "30px 0",
 });
 
 export const nameDiv = style({
-  width: "50%",
-});
-
-export const contentStyle = style({
   textAlign: "center",
-
-  //   height: "60vh",
-  padding: "1em 1em 3em 1em",
 });
 
 export const abstract = style({
-  textAlign: "center",
-  //   height: "60vh",
-  //   padding: "0em 1em 3em 1em",
-  margin: "3em auto 0 auto",
-  width: "50%",
-
-  "@media": {
-    "(max-width: 800px)": {
-      width: "80%",
-    },
-  },
+  maxWidth: "800px",
+  margin: "0 auto",
+  textAlign: "left",
+  padding: "20px",
+  backgroundColor: "#1e2329",
+  borderRadius: "8px",
+  marginBottom: "50px",
 });
 
 export const carousel = style({
-  background: "#B4CAD1",
-  margin: "5%",
-  "@media": {
-    "(max-width: 800px)": {
-      margin: "5% 0",
-    },
-  },
+  maxWidth: "1200px",
+  margin: "0 auto",
+  backgroundColor: "#1e2329",
+  borderRadius: "8px",
+  padding: "20px",
+});
+
+export const contentStyle = style({
+  padding: "40px",
+  textAlign: "center",
+  minHeight: "600px",
 });
 
 export const carouselContentFlex = style({
   display: "flex",
-  flexDirection: "row",
   justifyContent: "space-around",
-  alignItems: "center",
-  padding: "1em",
+  alignItems: "flex-start",
+  gap: "40px",
+  marginTop: "30px",
   "@media": {
-    "(max-width: 800px)": {
+    "screen and (max-width: 768px)": {
       flexDirection: "column",
+      gap: "30px",
     },
   },
 });
 
 export const carouselContentDivOne = style({
-  textAlign: "center",
-  width: "40%",
-  "@media": {
-    "(max-width: 800px)": {
-      width: "90%",
-    },
-  },
+  flex: "1",
+  display: "flex",
+  flexDirection: "column",
+  gap: "20px",
 });
 
 export const carouselContentDivTwo = style({
-  textAlign: "center",
-  width: "55%",
-  "@media": {
-    "(max-width: 800px)": {
-      width: "90%",
-    },
-  },
+  flex: "1",
+  display: "flex",
+  flexDirection: "column",
+  gap: "20px",
 });
+
+export const placeholderImage = style({
+  width: "100%",
+  height: "150px",
+  backgroundColor: "#404040",
+  border: "2px dashed #666",
+  borderRadius: "8px",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  color: "#ccc",
+  fontSize: "14px",
+});
+
+export const placeholderVideo = style({
+  width: "100%",
+  height: "300px",
+  backgroundColor: "#404040",
+  border: "2px dashed #666",
+  borderRadius: "8px",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  color: "#ccc",
+  fontSize: "18px",
+});
+
 export const italic = style({
   fontStyle: "italic",
 });

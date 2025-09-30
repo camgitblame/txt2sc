@@ -1,6 +1,6 @@
 .ant-carousel .slick-dots li button {
-  background: #000000;
-  opacity: 0.4;
+  background: #ffffff;
+  opacity: 0.6;
   /* width: 6px;
   height: 6px; */
   /* border-radius: 100%; */
@@ -8,28 +8,28 @@
 
 .ant-carousel .slick-dots li.slick-active button {
   opacity: 1;
-  background: #000000;
+  background: #ffffff;
   /* width: 7px;
   height: 7px; */
   /* border-radius: 100%; */
 }
 
 .ant-carousel .slick-next {
-  opacity: 0.4;
-  color: #000000;
+  opacity: 0.6;
+  color: #ffffff;
 }
 
-.ant-carousel .slick-next li.slick-active {
+.ant-carousel .slick-next:hover {
   opacity: 1;
-  color: #000000;
+  color: #ffffff;
 }
 
 .ant-carousel .slick-prev {
-  opacity: 0.4;
-  color: #000000;
+  opacity: 0.6;
+  color: #ffffff;
 }
 
-.ant-carousel .slick-prev li.slick-active {
+.ant-carousel .slick-prev:hover {
   opacity: 1;
-  color: #000000;
+  color: #ffffff;
 }
