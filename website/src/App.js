@@ -62,9 +62,9 @@ function App() {
       <div>
         <div className={styles.abstract}>
           <h2>Abstract</h2>
-          In this paper, we propose a method for text-driven movie scene generation to create diverse,
+          In this paper, we propose a method for movie scene walkthrough generation from text to create diverse,
           visually appealing, and cinematic walkthroughs of specific films. Our approach builds on
-          advanced diffusion models and uses DreamBooth to train Stable Diffusion models for few-shot,
+          ScenceScape and uses DreamBooth to train Stable Diffusion models for few-shot,
           scene-driven generation of novel views with specific characters, settings, and styles. We
           use ControlNet to condition these models for inpainting tasks, ensuring structurally and
           contextually coherent scenes as the model generates frames based on text descriptions.
