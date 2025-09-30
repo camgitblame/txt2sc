@@ -62,15 +62,11 @@ function App() {
       <div>
         <div className={styles.abstract}>
           <h2>Abstract</h2>
-          In this paper, we propose a method for movie scene walkthrough generation from text to create diverse,
-          visually appealing, and cinematic walkthroughs of specific films. Our approach builds on
-          ScenceScape and uses DreamBooth to train Stable Diffusion models for few-shot,
-          scene-driven generation of novel views with specific characters, settings, and styles. We
-          use ControlNet to condition these models for inpainting tasks, ensuring structurally and
-          contextually coherent scenes as the model generates frames based on text descriptions.
-          We conducted experiments on multiple stylistically distinct films, and our method demonstrates
-          strong performance in generating coherent movie scenes that maintain character consistency
-          and visual storytelling elements based on textual input.
+          Our project presents a text-to-3D scene pipeline that generates aesthetically pleasing, perpetual walkthroughs aligned with the visual style of target films. 
+          Building on the SceneScape baseline, we fine-tune Stable Diffusion with DreamBooth for few-shot, scene-focused synthesis that captures each film’s color palette, materials, and set dressing. 
+          To keep geometry stable under camera motion, we guide inpainting with a multi-ControlNet setup that conditions masks using ControlNet-Inpaint and ControlNet-Depth. At test time, we add four lightweight stabilizers, namely EMA-smoothed depth, seam-aware mask morphology, immediate mesh accumulation, and a short camera-motion warm-up, which improves structural consistency over long sequences.
+
+          We evaluate on five stylistically distinct movies. In pairwise comparisons, human experts and GPT-4V prefer our outputs over the baseline for film likeness, visual quality, 3D structural consistency, and prompt alignment. Quantitatively, CLIP-AS and reconstructed 3D density increase, indicating more appealing frames and fuller coverage, while reprojection error and CLIP-TS remain comparable to SceneScape. Overall, our results improve on the baseline and provide a practical route to film-specific, 3D-plausible walkthroughs that require no 3D or multiview training data.
         </div>
       </div>
       <Carousel arrows className={styles.carousel} afterChange={onChange}>
