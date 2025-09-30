@@ -1,0 +1,29 @@
+txt2sc/
+website/
+stable-diffusion/
+LoRA/
+data/
+sd3/
+Related Work/
+unused/
+wandb/
+.DS_Store
+*-output/
+*.ipynb
+activate_env.sh
+check_gpu.sh
+sd3con/
+cuda related/check_cuda copy.py
+cuda related/check_cuda.py
+cuda related/check_cuda.sh
+install-pytorch.sh
+setup_env.sh
+StyleScape/
+mask/
+warp_images/
+output/
+text
+model_ref/
+Style/
+.profile
+Text2scene/SD3_CONVERSION_NOTES.md
