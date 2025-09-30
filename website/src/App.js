@@ -10,7 +10,7 @@ function App() {
 
   return (
     <div className={styles.app}>
-      <h1>Text2Scene: Text-Driven Movie Scene Generation</h1>
+      <h1>Text to 3D Scene Generation for Movie Walkthroughs</h1>
       <h2>Project Page</h2>
       <div
         style={{
@@ -72,7 +72,7 @@ function App() {
       <Carousel arrows className={styles.carousel} afterChange={onChange}>
         <div className={styles.contentStyle}>
           <h2>
-            Scene from <span className={styles.italic}>Alien</span>
+            The Nostromo corridor from <span className={styles.italic}>Alien (1979)</span>
           </h2>
           <div className={styles.carouselContentFlex}>
             <div className={styles.carouselContentDivOne}>
