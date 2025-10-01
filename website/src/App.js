@@ -228,7 +228,7 @@ function App() {
           </h2>
           <div className={styles.carouselContentFlex}>
             <div className={styles.carouselContentDivOne}>
-              <h3>Few-shot training images:</h3>
+              <h3>DreamBooth training images:</h3>
               <img 
                 src={subTrain1} 
                 alt="The Substance training image 1" 
@@ -246,7 +246,7 @@ function App() {
               />
             </div>
             <div className={styles.carouselContentDivTwo}>
-              <h3>Generated walkthrough:</h3>
+              <h3>Generated walkthrough video:</h3>
               <div className={styles.placeholderVideo}>
                 <p>🎬 Video Placeholder</p>
                 <small>Generated The Substance scene walkthrough</small>
