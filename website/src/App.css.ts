@@ -48,7 +48,7 @@ export const carouselContentFlex = style({
   display: "flex",
   justifyContent: "center",
   alignItems: "flex-start",
-  gap: "30px",
+  gap: "15px",
   marginTop: "20px",
   "@media": {
     "screen and (max-width: 768px)": {

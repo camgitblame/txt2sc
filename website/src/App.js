@@ -1,7 +1,8 @@
 import * as styles from "./App.css.ts";
 import { Carousel } from "antd";
 import "./App.css";
-import { Github, ScrollText } from "lucide-react";
+import { Github, ScrollText, Play } from "lucide-react";
+import { useState } from "react";
 
 // Import training images
 import alienTrain1 from "./assets/alien/train1.jpg";
@@ -32,8 +33,78 @@ import passengersVideo from "./assets/passengers/video_passengers.mp4";
 import substanceVideo from "./assets/substance/video_the_substance.mp4";
 
 function App() {
+  const [currentView, setCurrentView] = useState('main');
+  
   const onChange = (currentSlide) => {
     console.log(currentSlide);
+  };
+
+  const renderResultsPage = () => {
+    const movies = [
+      { name: "The Shining", subtitle: "The Overlook Hotel hallway" },
+      { name: "The Substance", subtitle: "Elisabeth Sparkle's apartment" },
+      { name: "American Psycho", subtitle: "Patrick Bateman's apartment" },
+      { name: "Passengers", subtitle: "The Vienna Suite" },
+      { name: "Alien", subtitle: "The Nostromo corridor" }
+    ];
+
+    const variants = ["Baseline", "DB+1CN", "DB+2CN"];
+
+    return (
+      <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "20px" }}>
+        <div className={styles.abstract} style={{ marginBottom: "40px" }}>
+          <h2>Results Comparison</h2>
+          <p style={{ marginBottom: "20px" }}>
+            Below are the generated walkthrough videos for all five movies using three different methods:
+          </p>
+          <ul style={{ textAlign: "left", margin: "0", padding: "0 20px" }}>
+            <li><strong>Baseline</strong>: SceneScape (original method)</li>
+            <li><strong>DB+1CN</strong>: DreamBooth + ControlNet Inpaint</li>
+            <li><strong>DB+2CN</strong>: DreamBooth + ControlNet Inpaint + ControlNet Depth</li>
+          </ul>
+        </div>
+
+        {movies.map((movie, movieIndex) => (
+          <div key={movie.name} style={{ marginBottom: "60px" }}>
+            <h2 style={{ textAlign: "center", marginBottom: "30px" }}>
+              {movie.name} - <span className={styles.italic}>{movie.subtitle}</span>
+            </h2>
+            <div style={{ 
+              display: "grid", 
+              gridTemplateColumns: "repeat(3, 1fr)", 
+              gap: "20px",
+              maxWidth: "1200px",
+              margin: "0 auto"
+            }}>
+              {variants.map((variant, variantIndex) => (
+                <div key={variant} style={{ textAlign: "center" }}>
+                  <h3 style={{ marginBottom: "15px", fontSize: "18px" }}>{variant}</h3>
+                  <div style={{
+                    width: "100%",
+                    height: "250px",
+                    backgroundColor: "#404040",
+                    border: "2px dashed #666",
+                    borderRadius: "8px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    color: "#ccc",
+                    fontSize: "14px"
+                  }}>
+                    <div style={{ fontSize: "40px", marginBottom: "10px" }}>🎬</div>
+                    <div>Video Placeholder</div>
+                    <div style={{ fontSize: "12px", marginTop: "5px" }}>
+                      {movie.name} - {variant}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -80,8 +151,28 @@ function App() {
         >
           <ScrollText /> Paper
         </button>
+        <button
+          onClick={() => setCurrentView(currentView === 'main' ? 'results' : 'main')}
+          style={{
+            background: "none",
+            border: "none",
+            color: "inherit",
+            textDecoration: "none",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px",
+            cursor: "pointer",
+            fontSize: "inherit",
+            fontFamily: "inherit",
+          }}
+        >
+          <Play /> {currentView === 'main' ? 'Results' : 'Back to Main'}
+        </button>
       </div>
-      <div className={styles.nameContainer}>
+      
+      {currentView === 'main' ? (
+        <>
+          <div className={styles.nameContainer}>
         <div className={styles.nameDiv}>
           <h3>Cam Nguyen</h3>
           <code>camng44@gmail.com</code>
@@ -287,6 +378,10 @@ function App() {
           </div>
         </div>
       </Carousel>
+        </>
+      ) : (
+        renderResultsPage()
+      )}
     </div>
   );
 }
