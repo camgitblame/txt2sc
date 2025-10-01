@@ -84,7 +84,7 @@ function App() {
         <div className={styles.abstract}>
           <h2>Abstract</h2>
           We present a text-to-3D pipeline that generates aesthetically pleasing, perpetual scene walkthroughs aligned with the visual identity of target films. Building on the SceneScape baseline, we fine-tune Stable Diffusion with DreamBooth for few-shot, scene-focused synthesis that recreates each film’s color palette, materials, and set dressing.
-
+          
 
           To maintain stable geometry under camera motion, we guide inpainting with a multi-ControlNet setup that conditions masks using ControlNet-Inpaint and ControlNet-Depth. At test time, we add four lightweight stabilizers, namely EMA-smoothing for depth, seam-aware mask morphology, immediate mesh accumulation, and a short camera-motion warm-up, which improves structural consistency over long video sequences.
 
@@ -99,7 +99,7 @@ function App() {
           </h2>
           <div className={styles.carouselContentFlex}>
             <div className={styles.carouselContentDivOne}>
-              <h3>Few-shot training images:</h3>
+              <h3>DreamBooth training images:</h3>
               <img 
                 src={alienTrain1} 
                 alt="Alien training 1" 
@@ -132,7 +132,7 @@ function App() {
           </h2>
           <div className={styles.carouselContentFlex}>
             <div className={styles.carouselContentDivOne}>
-              <h3>Few-shot training images:</h3>
+              <h3>DreamBooth training images:</h3>
               <img 
                 src={asTrain1} 
                 alt="American Psycho training 1" 
@@ -160,11 +160,11 @@ function App() {
         </div>
         <div className={styles.contentStyle}>
           <h2>
-            The Overlook Hotel from <span className={styles.italic}>The Shining</span>
+            The Overlook Hotel hallway from <span className={styles.italic}>The Shining (1980)</span>
           </h2>
           <div className={styles.carouselContentFlex}>
             <div className={styles.carouselContentDivOne}>
-              <h3>Few-shot training images:</h3>
+              <h3>DreamBooth training images:</h3>
               <img 
                 src={shiningTrain1} 
                 alt="The Shining training 1" 
@@ -196,7 +196,7 @@ function App() {
           </h2>
           <div className={styles.carouselContentFlex}>
             <div className={styles.carouselContentDivOne}>
-              <h3>Few-shot training images:</h3>
+              <h3>DreamBooth training images:</h3>
               <img 
                 src={pasTrain1} 
                 alt="Passengers training 1" 
