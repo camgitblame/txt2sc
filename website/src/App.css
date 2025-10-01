@@ -1,3 +1,7 @@
+.ant-carousel .slick-dots {
+  display: none !important;
+}
+
 .ant-carousel .slick-dots li button {
   background: #ffffff;
   opacity: 0.6;
@@ -27,6 +31,8 @@
   align-items: center;
   justify-content: center;
   line-height: 1;
+  top: 50% !important;
+  transform: translateY(-50%);
 }
 
 .ant-carousel .slick-next:before {
@@ -53,6 +59,8 @@
   align-items: center;
   justify-content: center;
   line-height: 1;
+  top: 50% !important;
+  transform: translateY(-50%);
 }
 
 .ant-carousel .slick-prev:before {

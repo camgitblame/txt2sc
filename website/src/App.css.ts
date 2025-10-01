@@ -48,8 +48,10 @@ export const carouselContentFlex = style({
   display: "flex",
   justifyContent: "center",
   alignItems: "flex-start",
-  gap: "15px",
+  gap: "40px",
   marginTop: "20px",
+  maxWidth: "800px",
+  margin: "20px auto 0 auto",
   "@media": {
     "screen and (max-width: 768px)": {
       flexDirection: "column",
@@ -65,6 +67,8 @@ export const carouselContentDivOne = style({
   gap: "8px",
   color: "white",
   alignItems: "center",
+  padding: "0",
+  margin: "0",
 });
 
 export const carouselContentDivTwo = style({
@@ -74,6 +78,8 @@ export const carouselContentDivTwo = style({
   gap: "8px",
   color: "white",
   alignItems: "center",
+  padding: "0",
+  margin: "0",
 });
 
 export const placeholderImage = style({
