@@ -91,10 +91,10 @@ function App() {
         <div className={styles.abstract}>
           <h2>Abstract</h2>
           We present a text-to-3D pipeline that generates aesthetically pleasing, perpetual scene walkthroughs aligned with the visual identity of target films. Building on the SceneScape baseline, we fine-tune Stable Diffusion with DreamBooth for few-shot, scene-focused synthesis that recreates each film’s color palette, materials, and set dressing.
-          
+          {/* <br /><br/> */}
 
           To maintain stable geometry under camera motion, we guide inpainting with a multi-ControlNet setup that conditions masks using ControlNet-Inpaint and ControlNet-Depth. At test time, we add four lightweight stabilizers, namely EMA-smoothing for depth, seam-aware mask morphology, immediate mesh accumulation, and a short camera-motion warm-up, which improves structural consistency over long video sequences.
-
+          {/* <br /><br /> */}
 
           We evaluate the results on five stylistically distinct movies. In qualitative analysis, both human experts and GPT-4V strongly prefer our outputs over the baseline for film likeness, visual quality, 3D structural consistency, and prompt alignment. Quantitatively, CLIP-AS and reconstructed 3D density increase over the baseline, indicating more appealing frames and fuller coverage, while reprojection error and CLIP-TS remain comparable to SceneScape. Overall, our results improve on the baseline and provide a practical path to film-specific, 3D-plausible walkthroughs that require no 3D or multiview training data.
         </div>
@@ -106,7 +106,7 @@ function App() {
           </h2>
           <div className={styles.carouselContentFlex}>
             <div className={styles.carouselContentDivOne}>
-              <h3>DreamBooth training images:</h3>
+              <h3>DreamBooth Training Images</h3>
               <img 
                 src={alienTrain1} 
                 alt="Alien training 1" 
@@ -124,14 +124,12 @@ function App() {
               />
             </div>
             <div className={styles.carouselContentDivTwo}>
-              <h3>Generated walkthrough:</h3>
+              <h3>Generated Walkthrough Video</h3>
               <video 
                 src={alienVideo}
                 controls
-                autoPlay
                 muted
                 loop
-                className={styles.trainingVideo}
                 style={{ width: '100%', maxWidth: '500px', height: 'auto' }}
               >
                 Your browser does not support the video tag.
@@ -146,7 +144,7 @@ function App() {
           </h2>
           <div className={styles.carouselContentFlex}>
             <div className={styles.carouselContentDivOne}>
-              <h3>DreamBooth training images:</h3>
+              <h3>DreamBooth Training Images</h3>
               <img 
                 src={asTrain1} 
                 alt="American Psycho training 1" 
@@ -164,14 +162,12 @@ function App() {
               />
             </div>
             <div className={styles.carouselContentDivTwo}>
-              <h3>Generated walkthrough:</h3>
+              <h3>Generated Walkthrough Video</h3>
               <video 
                 src={asVideo}
                 controls
-                autoPlay
                 muted
                 loop
-                className={styles.trainingVideo}
                 style={{ width: '100%', maxWidth: '500px', height: 'auto' }}
               >
                 Your browser does not support the video tag.
@@ -185,7 +181,7 @@ function App() {
           </h2>
           <div className={styles.carouselContentFlex}>
             <div className={styles.carouselContentDivOne}>
-              <h3>DreamBooth training images:</h3>
+              <h3>DreamBooth Training Images</h3>
               <img 
                 src={shiningTrain1} 
                 alt="The Shining training 1" 
@@ -203,14 +199,12 @@ function App() {
               />
             </div>
             <div className={styles.carouselContentDivTwo}>
-              <h3>Generated walkthrough:</h3>
+              <h3>Generated Walkthrough Video</h3>
               <video 
                 src={shiningVideo}
                 controls
-                autoPlay
                 muted
                 loop
-                className={styles.trainingVideo}
                 style={{ width: '100%', maxWidth: '500px', height: 'auto' }}
               >
                 Your browser does not support the video tag.
@@ -224,7 +218,7 @@ function App() {
           </h2>
           <div className={styles.carouselContentFlex}>
             <div className={styles.carouselContentDivOne}>
-              <h3>DreamBooth training images:</h3>
+              <h3>DreamBooth Training Images</h3>
               <img 
                 src={pasTrain1} 
                 alt="Passengers training 1" 
@@ -242,14 +236,12 @@ function App() {
               />
             </div>
             <div className={styles.carouselContentDivTwo}>
-              <h3>Generated walkthrough:</h3>
+              <h3>Generated Walkthrough Video</h3>
               <video 
                 src={passengersVideo}
                 controls
-                autoPlay
                 muted
                 loop
-                className={styles.trainingVideo}
                 style={{ width: '100%', maxWidth: '500px', height: 'auto' }}
               >
                 Your browser does not support the video tag.
@@ -263,7 +255,7 @@ function App() {
           </h2>
           <div className={styles.carouselContentFlex}>
             <div className={styles.carouselContentDivOne}>
-              <h3>DreamBooth training images:</h3>
+              <h3>DreamBooth Training Images</h3>
               <img 
                 src={subTrain1} 
                 alt="The Substance training 1" 
@@ -285,10 +277,8 @@ function App() {
               <video 
                 src={substanceVideo}
                 controls
-                autoPlay
                 muted
                 loop
-                className={styles.trainingVideo}
                 style={{ width: '100%', maxWidth: '500px', height: 'auto' }}
               >
                 Your browser does not support the video tag.

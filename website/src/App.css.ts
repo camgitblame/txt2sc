@@ -48,12 +48,12 @@ export const carouselContentFlex = style({
   display: "flex",
   justifyContent: "center",
   alignItems: "flex-start",
-  gap: "20px",
-  marginTop: "30px",
+  gap: "30px",
+  marginTop: "20px",
   "@media": {
     "screen and (max-width: 768px)": {
       flexDirection: "column",
-      gap: "20px",
+      gap: "15px",
     },
   },
 });
@@ -62,16 +62,18 @@ export const carouselContentDivOne = style({
   flex: "1",
   display: "flex",
   flexDirection: "column",
-  gap: "20px",
+  gap: "8px",
   color: "white",
+  alignItems: "center",
 });
 
 export const carouselContentDivTwo = style({
   flex: "1",
   display: "flex",
   flexDirection: "column",
-  gap: "20px",
+  gap: "8px",
   color: "white",
+  alignItems: "center",
 });
 
 export const placeholderImage = style({
@@ -108,9 +110,9 @@ export const italic = style({
 
 export const trainingImage = style({
   width: "100%",
-  maxWidth: "200px",
+  maxWidth: "150px",
   aspectRatio: "1 / 1",
-  objectFit: "contain",
+  objectFit: "cover",
   borderRadius: "8px",
   border: "2px solid #666",
   backgroundColor: "#2a2a2a",
