@@ -24,6 +24,13 @@ import subTrain1 from "./assets/substance/train1.jpg";
 import subTrain2 from "./assets/substance/train2.jpg";
 import subTrain3 from "./assets/substance/train3.jpg";
 
+// Import videos
+import alienVideo from "./assets/alien/video_alien.mp4";
+import asVideo from "./assets/american_psycho/video_american_psycho.mp4";
+import shiningVideo from "./assets/the_shining/video_the_shining.mp4";
+import passengersVideo from "./assets/passengers/video_passengers.mp4";
+import substanceVideo from "./assets/substance/video_the_substance.mp4";
+
 function App() {
   const onChange = (currentSlide) => {
     console.log(currentSlide);
@@ -118,10 +125,17 @@ function App() {
             </div>
             <div className={styles.carouselContentDivTwo}>
               <h3>Generated walkthrough:</h3>
-              <div className={styles.placeholderVideo}>
-                <p>🎬 Video Placeholder</p>
-                <small>Generated Alien scene walkthrough</small>
-              </div>
+              <video 
+                src={alienVideo}
+                controls
+                autoPlay
+                muted
+                loop
+                className={styles.trainingVideo}
+                style={{ width: '100%', maxWidth: '500px', height: 'auto' }}
+              >
+                Your browser does not support the video tag.
+              </video>
             </div>
           </div>
         </div>
@@ -151,10 +165,17 @@ function App() {
             </div>
             <div className={styles.carouselContentDivTwo}>
               <h3>Generated walkthrough:</h3>
-              <div className={styles.placeholderVideo}>
-                <p>🎬 Video Placeholder</p>
-                <small>Generated American Psycho scene walkthrough</small>
-              </div>
+              <video 
+                src={asVideo}
+                controls
+                autoPlay
+                muted
+                loop
+                className={styles.trainingVideo}
+                style={{ width: '100%', maxWidth: '500px', height: 'auto' }}
+              >
+                Your browser does not support the video tag.
+              </video>
             </div>
           </div>
         </div>
@@ -183,16 +204,23 @@ function App() {
             </div>
             <div className={styles.carouselContentDivTwo}>
               <h3>Generated walkthrough:</h3>
-              <div className={styles.placeholderVideo}>
-                <p>🎬 Video Placeholder</p>
-                <small>Generated The Shining scene walkthrough</small>
-              </div>
+              <video 
+                src={shiningVideo}
+                controls
+                autoPlay
+                muted
+                loop
+                className={styles.trainingVideo}
+                style={{ width: '100%', maxWidth: '500px', height: 'auto' }}
+              >
+                Your browser does not support the video tag.
+              </video>
             </div>
           </div>
         </div>
         <div className={styles.contentStyle}>
           <h2>
-            Spaceship interior from <span className={styles.italic}>Passengers</span>
+            The Vienna Suite from <span className={styles.italic}>Passengers (2016)</span>
           </h2>
           <div className={styles.carouselContentFlex}>
             <div className={styles.carouselContentDivOne}>
@@ -215,16 +243,23 @@ function App() {
             </div>
             <div className={styles.carouselContentDivTwo}>
               <h3>Generated walkthrough:</h3>
-              <div className={styles.placeholderVideo}>
-                <p>🎬 Video Placeholder</p>
-                <small>Generated Passengers scene walkthrough</small>
-              </div>
+              <video 
+                src={passengersVideo}
+                controls
+                autoPlay
+                muted
+                loop
+                className={styles.trainingVideo}
+                style={{ width: '100%', maxWidth: '500px', height: 'auto' }}
+              >
+                Your browser does not support the video tag.
+              </video>
             </div>
           </div>
         </div>
         <div className={styles.contentStyle}>
           <h2>
-            Beauty clinic from <span className={styles.italic}>The Substance</span>
+            Elisabeth Sparkle’s apartment from <span className={styles.italic}>The Substance (2024)</span>
           </h2>
           <div className={styles.carouselContentFlex}>
             <div className={styles.carouselContentDivOne}>
@@ -247,10 +282,17 @@ function App() {
             </div>
             <div className={styles.carouselContentDivTwo}>
               <h3>Generated walkthrough video:</h3>
-              <div className={styles.placeholderVideo}>
-                <p>🎬 Video Placeholder</p>
-                <small>Generated The Substance scene walkthrough</small>
-              </div>
+              <video 
+                src={substanceVideo}
+                controls
+                autoPlay
+                muted
+                loop
+                className={styles.trainingVideo}
+                style={{ width: '100%', maxWidth: '500px', height: 'auto' }}
+              >
+                Your browser does not support the video tag.
+              </video>
             </div>
           </div>
         </div>
