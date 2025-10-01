@@ -102,17 +102,17 @@ function App() {
               <h3>Few-shot training images:</h3>
               <img 
                 src={alienTrain1} 
-                alt="Alien training image 1" 
+                alt="Alien training 1" 
                 className={styles.trainingImage}
               />
               <img 
                 src={alienTrain2} 
-                alt="Alien training image 2" 
+                alt="Alien training 2" 
                 className={styles.trainingImage}
               />
               <img 
                 src={alienTrain3} 
-                alt="Alien training image 3" 
+                alt="Alien training 3" 
                 className={styles.trainingImage}
               />
             </div>
@@ -135,17 +135,17 @@ function App() {
               <h3>Few-shot training images:</h3>
               <img 
                 src={asTrain1} 
-                alt="American Psycho training image 1" 
+                alt="American Psycho training 1" 
                 className={styles.trainingImage}
               />
               <img 
                 src={asTrain2} 
-                alt="American Psycho training image 2" 
+                alt="American Psycho training 2" 
                 className={styles.trainingImage}
               />
               <img 
                 src={asTrain3} 
-                alt="American Psycho training image 3" 
+                alt="American Psycho training 3" 
                 className={styles.trainingImage}
               />
             </div>
@@ -167,17 +167,17 @@ function App() {
               <h3>Few-shot training images:</h3>
               <img 
                 src={shiningTrain1} 
-                alt="The Shining training image 1" 
+                alt="The Shining training 1" 
                 className={styles.trainingImage}
               />
               <img 
                 src={shiningTrain2} 
-                alt="The Shining training image 2" 
+                alt="The Shining training 2" 
                 className={styles.trainingImage}
               />
               <img 
                 src={shiningTrain3} 
-                alt="The Shining training image 3" 
+                alt="The Shining training 3" 
                 className={styles.trainingImage}
               />
             </div>
@@ -199,17 +199,17 @@ function App() {
               <h3>Few-shot training images:</h3>
               <img 
                 src={pasTrain1} 
-                alt="Passengers training image 1" 
+                alt="Passengers training 1" 
                 className={styles.trainingImage}
               />
               <img 
                 src={pasTrain2} 
-                alt="Passengers training image 2" 
+                alt="Passengers training 2" 
                 className={styles.trainingImage}
               />
               <img 
                 src={pasTrain3} 
-                alt="Passengers training image 3" 
+                alt="Passengers training 3" 
                 className={styles.trainingImage}
               />
             </div>
@@ -231,17 +231,17 @@ function App() {
               <h3>DreamBooth training images:</h3>
               <img 
                 src={subTrain1} 
-                alt="The Substance training image 1" 
+                alt="The Substance training 1" 
                 className={styles.trainingImage}
               />
               <img 
                 src={subTrain2} 
-                alt="The Substance training image 2" 
+                alt="The Substance training 2" 
                 className={styles.trainingImage}
               />
               <img 
                 src={subTrain3} 
-                alt="The Substance training image 3" 
+                alt="The Substance training 3" 
                 className={styles.trainingImage}
               />
             </div>
