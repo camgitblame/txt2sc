@@ -41,18 +41,19 @@ export const contentStyle = style({
   padding: "40px",
   textAlign: "center",
   minHeight: "600px",
+  color: "white",
 });
 
 export const carouselContentFlex = style({
   display: "flex",
-  justifyContent: "space-around",
+  justifyContent: "center",
   alignItems: "flex-start",
-  gap: "40px",
+  gap: "20px",
   marginTop: "30px",
   "@media": {
     "screen and (max-width: 768px)": {
       flexDirection: "column",
-      gap: "30px",
+      gap: "20px",
     },
   },
 });
@@ -62,6 +63,7 @@ export const carouselContentDivOne = style({
   display: "flex",
   flexDirection: "column",
   gap: "20px",
+  color: "white",
 });
 
 export const carouselContentDivTwo = style({
@@ -69,6 +71,7 @@ export const carouselContentDivTwo = style({
   display: "flex",
   flexDirection: "column",
   gap: "20px",
+  color: "white",
 });
 
 export const placeholderImage = style({
@@ -101,6 +104,16 @@ export const placeholderVideo = style({
 
 export const italic = style({
   fontStyle: "italic",
+});
+
+export const trainingImage = style({
+  width: "100%",
+  maxWidth: "200px",
+  aspectRatio: "1 / 1",
+  objectFit: "contain",
+  borderRadius: "8px",
+  border: "2px solid #666",
+  backgroundColor: "#2a2a2a",
 });
 
 export const dreamboothImage = style({
