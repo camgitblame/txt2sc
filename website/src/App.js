@@ -10,7 +10,7 @@ function App() {
 
   return (
     <div className={styles.app}>
-      <h1>Text to 3D Scene Generation for Movie Walkthroughs</h1>
+      <h1>Text-to-3D Scene Generation for Movie Walkthroughs</h1>
       <h2>Project Page</h2>
       <div
         style={{
@@ -62,11 +62,7 @@ function App() {
       <div>
         <div className={styles.abstract}>
           <h2>Abstract</h2>
-          Our project presents a text-to-3D scene pipeline that generates aesthetically pleasing, perpetual walkthroughs aligned with the visual style of target films. 
-          Building on the SceneScape baseline, we fine-tune Stable Diffusion with DreamBooth for few-shot, scene-focused synthesis that captures each film’s color palette, materials, and set dressing. 
-          To keep geometry stable under camera motion, we guide inpainting with a multi-ControlNet setup that conditions masks using ControlNet-Inpaint and ControlNet-Depth. At test time, we add four lightweight stabilizers, namely EMA-smoothed depth, seam-aware mask morphology, immediate mesh accumulation, and a short camera-motion warm-up, which improves structural consistency over long sequences.
-
-          We evaluate on five stylistically distinct movies. In pairwise comparisons, human experts and GPT-4V prefer our outputs over the baseline for film likeness, visual quality, 3D structural consistency, and prompt alignment. Quantitatively, CLIP-AS and reconstructed 3D density increase, indicating more appealing frames and fuller coverage, while reprojection error and CLIP-TS remain comparable to SceneScape. Overall, our results improve on the baseline and provide a practical route to film-specific, 3D-plausible walkthroughs that require no 3D or multiview training data.
+          We evaluate the results on five stylistically distinct movies. In qualitative analysis, both human experts and GPT-4V strongly prefer our outputs over the baseline for film likeness, visual quality, 3D structural consistency, and prompt alignment. Quantitatively, CLIP-AS and reconstructed 3D density increase over the baseline, indicating more appealing frames and fuller coverage, while reprojection error and CLIP-TS remain comparable to SceneScape. Overall, our results improve on the baseline and provide a practical path to film-specific, 3D-plausible walkthroughs that require no 3D or multiview training data.
         </div>
       </div>
       <Carousel arrows className={styles.carousel} afterChange={onChange}>
