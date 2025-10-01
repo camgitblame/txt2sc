@@ -3,6 +3,27 @@ import { Carousel } from "antd";
 import "./App.css";
 import { Github, ScrollText } from "lucide-react";
 
+// Import training images
+import alienTrain1 from "./assets/alien/train1.jpg";
+import alienTrain2 from "./assets/alien/train2.jpg";
+import alienTrain3 from "./assets/alien/train3.jpg";
+
+import asTrain1 from "./assets/american_psycho/train1.jpg";
+import asTrain2 from "./assets/american_psycho/train2.jpg";
+import asTrain3 from "./assets/american_psycho/train3.png";
+
+import shiningTrain1 from "./assets/the_shining/train1.jpg";
+import shiningTrain2 from "./assets/the_shining/train2.jpg";
+import shiningTrain3 from "./assets/the_shining/train3.jpg";
+
+import pasTrain1 from "./assets/passengers/train1.jpg";
+import pasTrain2 from "./assets/passengers/train2.jpg";
+import pasTrain3 from "./assets/passengers/train3.jpg";
+
+import subTrain1 from "./assets/substance/train1.jpg";
+import subTrain2 from "./assets/substance/train2.jpg";
+import subTrain3 from "./assets/substance/train3.jpg";
+
 function App() {
   const onChange = (currentSlide) => {
     console.log(currentSlide);
@@ -62,6 +83,12 @@ function App() {
       <div>
         <div className={styles.abstract}>
           <h2>Abstract</h2>
+          We present a text-to-3D pipeline that generates aesthetically pleasing, perpetual scene walkthroughs aligned with the visual identity of target films. Building on the SceneScape baseline, we fine-tune Stable Diffusion with DreamBooth for few-shot, scene-focused synthesis that recreates each film’s color palette, materials, and set dressing.
+
+
+          To maintain stable geometry under camera motion, we guide inpainting with a multi-ControlNet setup that conditions masks using ControlNet-Inpaint and ControlNet-Depth. At test time, we add four lightweight stabilizers, namely EMA-smoothing for depth, seam-aware mask morphology, immediate mesh accumulation, and a short camera-motion warm-up, which improves structural consistency over long video sequences.
+
+
           We evaluate the results on five stylistically distinct movies. In qualitative analysis, both human experts and GPT-4V strongly prefer our outputs over the baseline for film likeness, visual quality, 3D structural consistency, and prompt alignment. Quantitatively, CLIP-AS and reconstructed 3D density increase over the baseline, indicating more appealing frames and fuller coverage, while reprojection error and CLIP-TS remain comparable to SceneScape. Overall, our results improve on the baseline and provide a practical path to film-specific, 3D-plausible walkthroughs that require no 3D or multiview training data.
         </div>
       </div>
@@ -73,18 +100,21 @@ function App() {
           <div className={styles.carouselContentFlex}>
             <div className={styles.carouselContentDivOne}>
               <h3>Few-shot training images:</h3>
-              <div className={styles.placeholderImage}>
-                <p>Training Image 1</p>
-                <small>Placeholder for Alien training data</small>
-              </div>
-              <div className={styles.placeholderImage}>
-                <p>Training Image 2</p>
-                <small>Placeholder for Alien training data</small>
-              </div>
-              <div className={styles.placeholderImage}>
-                <p>Training Image 3</p>
-                <small>Placeholder for Alien training data</small>
-              </div>
+              <img 
+                src={alienTrain1} 
+                alt="Alien training image 1" 
+                className={styles.trainingImage}
+              />
+              <img 
+                src={alienTrain2} 
+                alt="Alien training image 2" 
+                className={styles.trainingImage}
+              />
+              <img 
+                src={alienTrain3} 
+                alt="Alien training image 3" 
+                className={styles.trainingImage}
+              />
             </div>
             <div className={styles.carouselContentDivTwo}>
               <h3>Generated walkthrough:</h3>
@@ -98,23 +128,26 @@ function App() {
         <div className={styles.contentStyle}>
           <h2>
             Patrick Bateman's apartment from{" "}
-            <span className={styles.italic}>American Psycho</span>
+            <span className={styles.italic}>American Psycho (2000)</span>
           </h2>
           <div className={styles.carouselContentFlex}>
             <div className={styles.carouselContentDivOne}>
               <h3>Few-shot training images:</h3>
-              <div className={styles.placeholderImage}>
-                <p>Training Image 1</p>
-                <small>Placeholder for American Psycho training data</small>
-              </div>
-              <div className={styles.placeholderImage}>
-                <p>Training Image 2</p>
-                <small>Placeholder for American Psycho training data</small>
-              </div>
-              <div className={styles.placeholderImage}>
-                <p>Training Image 3</p>
-                <small>Placeholder for American Psycho training data</small>
-              </div>
+              <img 
+                src={asTrain1} 
+                alt="American Psycho training image 1" 
+                className={styles.trainingImage}
+              />
+              <img 
+                src={asTrain2} 
+                alt="American Psycho training image 2" 
+                className={styles.trainingImage}
+              />
+              <img 
+                src={asTrain3} 
+                alt="American Psycho training image 3" 
+                className={styles.trainingImage}
+              />
             </div>
             <div className={styles.carouselContentDivTwo}>
               <h3>Generated walkthrough:</h3>
@@ -132,18 +165,21 @@ function App() {
           <div className={styles.carouselContentFlex}>
             <div className={styles.carouselContentDivOne}>
               <h3>Few-shot training images:</h3>
-              <div className={styles.placeholderImage}>
-                <p>Training Image 1</p>
-                <small>Placeholder for The Shining training data</small>
-              </div>
-              <div className={styles.placeholderImage}>
-                <p>Training Image 2</p>
-                <small>Placeholder for The Shining training data</small>
-              </div>
-              <div className={styles.placeholderImage}>
-                <p>Training Image 3</p>
-                <small>Placeholder for The Shining training data</small>
-              </div>
+              <img 
+                src={shiningTrain1} 
+                alt="The Shining training image 1" 
+                className={styles.trainingImage}
+              />
+              <img 
+                src={shiningTrain2} 
+                alt="The Shining training image 2" 
+                className={styles.trainingImage}
+              />
+              <img 
+                src={shiningTrain3} 
+                alt="The Shining training image 3" 
+                className={styles.trainingImage}
+              />
             </div>
             <div className={styles.carouselContentDivTwo}>
               <h3>Generated walkthrough:</h3>
@@ -161,18 +197,21 @@ function App() {
           <div className={styles.carouselContentFlex}>
             <div className={styles.carouselContentDivOne}>
               <h3>Few-shot training images:</h3>
-              <div className={styles.placeholderImage}>
-                <p>Training Image 1</p>
-                <small>Placeholder for Passengers training data</small>
-              </div>
-              <div className={styles.placeholderImage}>
-                <p>Training Image 2</p>
-                <small>Placeholder for Passengers training data</small>
-              </div>
-              <div className={styles.placeholderImage}>
-                <p>Training Image 3</p>
-                <small>Placeholder for Passengers training data</small>
-              </div>
+              <img 
+                src={pasTrain1} 
+                alt="Passengers training image 1" 
+                className={styles.trainingImage}
+              />
+              <img 
+                src={pasTrain2} 
+                alt="Passengers training image 2" 
+                className={styles.trainingImage}
+              />
+              <img 
+                src={pasTrain3} 
+                alt="Passengers training image 3" 
+                className={styles.trainingImage}
+              />
             </div>
             <div className={styles.carouselContentDivTwo}>
               <h3>Generated walkthrough:</h3>
@@ -190,18 +229,21 @@ function App() {
           <div className={styles.carouselContentFlex}>
             <div className={styles.carouselContentDivOne}>
               <h3>Few-shot training images:</h3>
-              <div className={styles.placeholderImage}>
-                <p>Training Image 1</p>
-                <small>Placeholder for The Substance training data</small>
-              </div>
-              <div className={styles.placeholderImage}>
-                <p>Training Image 2</p>
-                <small>Placeholder for The Substance training data</small>
-              </div>
-              <div className={styles.placeholderImage}>
-                <p>Training Image 3</p>
-                <small>Placeholder for The Substance training data</small>
-              </div>
+              <img 
+                src={subTrain1} 
+                alt="The Substance training image 1" 
+                className={styles.trainingImage}
+              />
+              <img 
+                src={subTrain2} 
+                alt="The Substance training image 2" 
+                className={styles.trainingImage}
+              />
+              <img 
+                src={subTrain3} 
+                alt="The Substance training image 3" 
+                className={styles.trainingImage}
+              />
             </div>
             <div className={styles.carouselContentDivTwo}>
               <h3>Generated walkthrough:</h3>
