@@ -1,6 +1,6 @@
 # Text2Scene Website
 
-This is the project website for Text2Scene: Text-Driven Movie Scene Generation.
+This is the project website for Text-to-3D Scene Generation for Movie Walkthroughs
 
 ## Getting Started
 
@@ -26,13 +26,12 @@ It correctly bundles React in production mode and optimizes the build for the be
 The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
 
-### Deployment to GitHub Pages
+### Deployment 
 
 To deploy to text2scene.github.io:
 
 1. Build the project: `npm run build`
-2. Deploy to GitHub Pages using your preferred method
-3. The site will be available at https://text2scene.github.io
+2. The site will be available at https://text2scene.vercel.app/
 
 ## Project Structure
 

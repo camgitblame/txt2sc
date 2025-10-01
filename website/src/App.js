@@ -32,6 +32,27 @@ import shiningVideo from "./assets/the_shining/video_the_shining.mp4";
 import passengersVideo from "./assets/passengers/video_passengers.mp4";
 import substanceVideo from "./assets/substance/video_the_substance.mp4";
 
+// Import baseline videos
+import alienBaseline from "./assets/alien/video_baseline.mp4";
+import asBaseline from "./assets/american_psycho/video_baseline.mp4";
+import shiningBaseline from "./assets/the_shining/video_baseline.mp4";
+import passengersBaseline from "./assets/passengers/video_baseline.mp4";
+import substanceBaseline from "./assets/substance/video_baseline.mp4";
+
+// Import DB+1CN videos
+import alienDb1cn from "./assets/alien/video_db_1cn.mp4";
+import asDb1cn from "./assets/american_psycho/video_db_1cn.mp4";
+import shiningDb1cn from "./assets/the_shining/video_db_1cn.mp4";
+import passengersDb1cn from "./assets/passengers/video_db_1cn.mp4";
+import substanceDb1cn from "./assets/substance/video_db_1cn.mp4";
+
+// Import DB+2CN videos
+import alienDb2cn from "./assets/alien/video_db_2cn.mp4";
+import asDb2cn from "./assets/american_psycho/video_db_2cn.mp4";
+import shiningDb2cn from "./assets/the_shining/video_db_2cn.mp4";
+import passengersDb2cn from "./assets/passengers/video_db_2cn.mp4";
+import substanceDb2cn from "./assets/substance/video_db_2cn.mp4";
+
 function App() {
   const [currentView, setCurrentView] = useState('main');
   
@@ -49,6 +70,35 @@ function App() {
     ];
 
     const variants = ["Baseline", "DB+1CN", "DB+2CN"];
+
+    // Video mapping
+    const videoMap = {
+      "The Shining": {
+        "Baseline": shiningBaseline,
+        "DB+1CN": shiningDb1cn,
+        "DB+2CN": shiningDb2cn
+      },
+      "The Substance": {
+        "Baseline": substanceBaseline,
+        "DB+1CN": substanceDb1cn,
+        "DB+2CN": substanceDb2cn
+      },
+      "American Psycho": {
+        "Baseline": asBaseline,
+        "DB+1CN": asDb1cn,
+        "DB+2CN": asDb2cn
+      },
+      "Passengers": {
+        "Baseline": passengersBaseline,
+        "DB+1CN": passengersDb1cn,
+        "DB+2CN": passengersDb2cn
+      },
+      "Alien": {
+        "Baseline": alienBaseline,
+        "DB+1CN": alienDb1cn,
+        "DB+2CN": alienDb2cn
+      }
+    };
 
     return (
       <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "20px" }}>
@@ -79,25 +129,21 @@ function App() {
               {variants.map((variant, variantIndex) => (
                 <div key={variant} style={{ textAlign: "center" }}>
                   <h3 style={{ marginBottom: "15px", fontSize: "18px" }}>{variant}</h3>
-                  <div style={{
-                    width: "100%",
-                    height: "250px",
-                    backgroundColor: "#404040",
-                    border: "2px dashed #666",
-                    borderRadius: "8px",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "#ccc",
-                    fontSize: "14px"
-                  }}>
-                    <div style={{ fontSize: "40px", marginBottom: "10px" }}>🎬</div>
-                    <div>Video Placeholder</div>
-                    <div style={{ fontSize: "12px", marginTop: "5px" }}>
-                      {movie.name} - {variant}
-                    </div>
-                  </div>
+                  <video
+                    controls
+                    muted
+                    loop
+                    style={{
+                      width: "100%",
+                      maxWidth: "300px",
+                      aspectRatio: "1 / 1",
+                      borderRadius: "8px",
+                      objectFit: "contain"
+                    }}
+                  >
+                    <source src={videoMap[movie.name][variant]} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
                 </div>
               ))}
             </div>
