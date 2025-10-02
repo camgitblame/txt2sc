@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=indi-sd15-test
+#SBATCH --job-name=gen_shine
 #SBATCH --partition=preemptgpu
 #SBATCH --gres=gpu:1
 #SBATCH --nodes=1
@@ -10,4 +10,4 @@
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
 
-python generate_indiana_sd15.py
+python gen_shine.py
