@@ -61,7 +61,7 @@ python run.py --config config/example_configs/the_shining.yaml
 cd dreambooth_training
 
 # Train on images from the Overlook Hotel Hallway from The Shining (1980)
-bash train_hp_sd15.sh
+bash train_the_shining.sh
 ```
 
 ## Related Work
