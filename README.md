@@ -12,6 +12,7 @@ This project generates 3D scene walkthroughs for movies from text by combining S
 ├── SceneScape_baseline/           # Baseline (SceneScape)
 ├── dreambooth_training/           # DreamBooth training scripts 
 ├── generation_sampler/            # Generation scripts to test DreamBooth checkpoints
+├── notebook/                      # Notebooks for computing quatitative metrics, visualizing data, sample frames and output video frames 
 ├── setup/                         # Environment config and dependencies
 
 ```
