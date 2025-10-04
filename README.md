@@ -8,14 +8,13 @@ This project generates cinematic 3D scene walkthroughs from text descriptions by
 ### Project Structure
 
 ```
-├── Text2scene/                    # Main generation pipeline with SD3 integration
-├── SceneScape_baseline/           # Original SceneScape implementation
+├── Text2scene/                    # Main generation pipeline with DreamBooth and ControlNet integration
+├── SceneScape_baseline/           # Original baseline (SceneScape) implementation
 ├── dreambooth_training/           # DreamBooth training scripts 
 ├── generation_sampler/            # Standalone generation scripts
 ├── data/                          # Training datasets and movie scene references
-├── output/                        # Generated videos and intermediate results
 ├── setup/                         # Environment config and dependencies
-└── sd3/                          # Stable Diffusion 3 model files
+
 ```
 
 
@@ -50,7 +49,7 @@ Generate a scene walkthrough video:
 
 ```bash
 cd Text2scene
-python run.py --config config/example_configs/hp.yaml
+python run.py --config config/example_configs/the_shining.yaml
 ```
 
 
@@ -61,13 +60,13 @@ python run.py --config config/example_configs/hp.yaml
 ```bash
 cd dreambooth_training
 
-# Train on sceneswith the Great Hall from Harry Potter
-bash train_hp_sd15.sh
+# Train on images from the Overlook Hotel Hallway from The Shining (1980)
+bash train_the_shining.sh
 ```
 
 ## Related Work
 
 - [SceneScape](https://arxiv.org/abs/2302.01133) - Original text-to-3D scene generation
 - [DreamBooth](https://arxiv.org/abs/2208.12242) - Few-shot style adaptation
-- [Stable Diffusion 3](https://stability.ai/news/stable-diffusion-3) - Advanced text-to-image generation
+
 
