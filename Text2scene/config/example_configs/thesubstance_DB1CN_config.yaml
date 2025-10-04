@@ -1,0 +1,26 @@
+# DreamBooth + 1 ControlNet for The Substance 
+runs_dir: output
+seed: 13
+frames: 30
+
+# DreamBooth Model Configuration
+stable_diffusion_checkpoint: "camgitblame/the_substance"
+use_dreambooth_unet: true
+
+# ControlNet Configuration
+use_controlnet: true
+controlnet_model: "lllyasviel/control_v11p_sd15_inpaint"
+controlnet_conditioning_scale: 0.85
+classifier_free_guidance_scale: 8
+
+# Scene Prompting
+inpainting_prompt: "sks thesubstance, POV walkthrough, Elisabeth Sparkle's apartment, masterpiece, indoor scene, best quality"
+
+
+# SPEED OPTIMIZATIONS
+num_inpainting_steps: 35
+inpainting_resolution: 600
+use_xformers: true
+enable_mix_precision: false
+finetune_decoder: false
+finetune_depth_model: false

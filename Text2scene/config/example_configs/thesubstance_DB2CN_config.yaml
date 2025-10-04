@@ -1,0 +1,35 @@
+# DreamBooth + 2 ControlNet for The Substance 
+runs_dir: output
+seed: 13
+frames: 30
+
+# DreamBooth Model Configuration
+stable_diffusion_checkpoint: "camgitblame/substance"
+use_dreambooth_unet: true
+
+# ControlNet Inpainting Configuration
+use_controlnet: true
+controlnet_model: "lllyasviel/control_v11p_sd15_inpaint"
+controlnet_conditioning_scale: 0.85
+classifier_free_guidance_scale: 8
+
+# Scene Prompting
+inpainting_prompt: "sks thesubstance, POV walkthrough, Elisabeth Sparkle's apartment, empty interior (no people in room), teal-blue fabric wall panels, mauve carpet, circular cove ceiling light, gold floor lamp, glass shelving bar, minimalist furniture, panoramic city view through full-height glass wall, faces only inside a portrait on the wall and on a billboard outside the window, balanced exposure, rectilinear walls, modern luxury residence, masterpiece, best quality, sharp details"
+negative_inpainting_prompt: "people in room, extra faces, reflections of people, mannequin, text signage overlays, logos, motion blur, fisheye, dutch angle, warped perspective, wobbly edges, melted geometry, stretched textures, blank wall where portrait should be, missing billboard, overexposed sky, heavy bloom, lens flare, chromatic aberration, noisy shadows, low quality, blurry"
+
+# SPEED OPTIMIZATIONS
+num_inpainting_steps: 35
+inpainting_resolution: 600
+use_xformers: true
+enable_mix_precision: false
+finetune_decoder: false
+finetune_depth_model: false
+
+# GEOMETRY FIXES CONFIGURATION (Depth ControlNet)
+enable_warp_fix: true
+warp_fix_overrides:
+  fix_inpaint_strength: 0.46      # keep carpet/fabric texture + portrait detail
+  fix_mask_op: "erode"
+  fix_mask_iters: 2
+  fix_depth_cn_scale: 0.60        # a bit lighter so window/city depth isn’t over-flattened
+  fix_depth_ema_alpha: 0.75       # smooth camera glide, stable walls/ceiling ring
