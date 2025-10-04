@@ -7,6 +7,7 @@ This project presents a text-to-3D pipeline that generates aesthetically pleasin
 ### Project Links and Resources
 
 - [Project Page](https://text2scene.vercel.app/) 
+
 The output videos of all models are available in our project pages. 
 
 - [DreamBooth Checkpoints](https://huggingface.co/camgitblame) 
