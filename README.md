@@ -72,7 +72,7 @@ Generate a movie walkthrough video of the Overlook Hotel hallway from The Shinin
 
 ```bash
 cd Text2scene
-python run_text2scene.py --base-config ./config/base-config.yaml --example_config ./config/example_configs/thesubstance_DB1CN_config.yaml
+python run_text2scene.py --base-config ./config/base-config.yaml --example_config ./config/example_configs/theshining_DB1CN_config.yaml
 ```
 or 
 
