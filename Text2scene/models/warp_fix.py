@@ -23,8 +23,8 @@ DEFAULTS = {
     "fix_enable_mesh_accumulation": True,
     "fix_enable_depth_controlnet": True,  # requires diffusers ControlNet weights
     "fix_depth_controlnet_id": "lllyasviel/control_v11f1p_sd15_depth",
-    "fix_depth_cn_scale": 0.8,  # 0.6–1.0 works well
-    "fix_inpaint_strength": 0.45,  # denoise strength (0.35–0.5)
+    "fix_depth_cn_scale": 0.8,  # 0.6-1.0 works well
+    "fix_inpaint_strength": 0.45,  # denoise strength (0.35-0.5)
     "fix_mask_op": "erode",  # "erode" | "dilate" | None
     "fix_mask_iters": 1,  # small number on purpose
     "fix_seed": None,  # if None, will use config['seed'] or 13
@@ -78,10 +78,7 @@ def _enable_multi_controlnet(model, depth_cn_id: str):
 
 
 def attach_fast_fixes(model, config_overrides: Optional[Dict[str, Any]] = None):
-    """
-    Monkey-patch the given model with 5 fast fixes.
-    Call this once, right after you construct WarpInpaintModel.
-    """
+
     cfg = DEFAULTS.copy()
     if config_overrides:
         cfg.update(config_overrides)
