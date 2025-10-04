@@ -108,7 +108,7 @@ function App() {
             Below are the generated walkthrough videos for all five movies using three different methods:
           </p>
           <ul style={{ textAlign: "left", margin: "0", padding: "0 20px" }}>
-            <li><strong>Baseline</strong>: SceneScape (original method)</li>
+            <li><strong>Baseline</strong>: SceneScape</li>
             <li><strong>DB+1CN</strong>: DreamBooth + ControlNet Inpaint</li>
             <li><strong>DB+2CN</strong>: DreamBooth + ControlNet Inpaint + ControlNet Depth</li>
           </ul>
