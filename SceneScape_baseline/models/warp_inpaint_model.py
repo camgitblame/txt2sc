@@ -1,3 +1,4 @@
+# SceneScape 's WarpInpaintModel
 import copy
 import sys
 from datetime import datetime
@@ -11,7 +12,11 @@ import trimesh
 from PIL import Image
 from diffusers import StableDiffusionInpaintPipeline, DDIMScheduler, AutoencoderKL
 from einops import rearrange
-from kornia.geometry import PinholeCamera, transform_points, convert_points_from_homogeneous
+from kornia.geometry import (
+    PinholeCamera,
+    transform_points,
+    convert_points_from_homogeneous,
+)
 from kornia.morphology import dilation, opening
 from pytorch3d.renderer import (
     PerspectiveCameras,
@@ -27,7 +32,6 @@ from util.general_utils import (
 from util.midas_utils import dpt_transform
 
 
-
 class WarpInpaintModel(torch.nn.Module):
     def __init__(self, config):
         super().__init__()
@@ -39,7 +43,10 @@ class WarpInpaintModel(torch.nn.Module):
         now = datetime.now()
         dt_string = now.strftime("%d-%m-%Y_%H-%M")
         run_dir_root = Path(config["runs_dir"])
-        self.run_dir = run_dir_root / f"{dt_string}_{config['inpainting_prompt'].replace(' ', '_')[:40]}"
+        self.run_dir = (
+            run_dir_root
+            / f"{dt_string}_{config['inpainting_prompt'].replace(' ', '_')[:40]}"
+        )
         self.run_dir.mkdir(parents=True, exist_ok=True)
 
         self.device = config["device"]
@@ -52,7 +59,9 @@ class WarpInpaintModel(torch.nn.Module):
             torch_dtype=torch.float16,
             revision="fp16",
         )
-        self.inpainting_pipeline.scheduler = DDIMScheduler.from_config(self.inpainting_pipeline.scheduler.config)
+        self.inpainting_pipeline.scheduler = DDIMScheduler.from_config(
+            self.inpainting_pipeline.scheduler.config
+        )
         self.inpainting_pipeline = self.inpainting_pipeline.to(self.device)
         if self.config["use_xformers"]:
             self.inpainting_pipeline.set_use_memory_efficient_attention_xformers(True)
@@ -68,7 +77,9 @@ class WarpInpaintModel(torch.nn.Module):
         ).images[0]
         self.image_tensor = ToTensor()(image).unsqueeze(0).to(self.device)
 
-        self.depth_model = torch.hub.load("intel-isl/MiDaS", "DPT_Large").to(self.device)
+        self.depth_model = torch.hub.load("intel-isl/MiDaS", "DPT_Large").to(
+            self.device
+        )
 
         with torch.no_grad():
             self.depth, self.disparity = self.get_depth(self.image_tensor)
@@ -84,13 +95,19 @@ class WarpInpaintModel(torch.nn.Module):
             self.current_camera.rotating = True
             self.current_camera.no_rotations_count = 0
             self.current_camera.rotations_count = 0
-            self.current_camera.rotating_right = 1 if torch.rand(1, device=self.device) > 0.5 else -1
-            self.current_camera.move_dir = torch.tensor([[0.0, 0.0, 1.0]], device=self.device)
+            self.current_camera.rotating_right = (
+                1 if torch.rand(1, device=self.device) > 0.5 else -1
+            )
+            self.current_camera.move_dir = torch.tensor(
+                [[0.0, 0.0, 1.0]], device=self.device
+            )
 
         elif self.config["motion"] == "translations":
             self.current_camera.translating_right = 1
             self.initial_median_disparity = torch.median(self.disparity)
-            self.current_camera.move_dir = torch.tensor([[1.0, 0.0, 0.0]], device=self.device)
+            self.current_camera.move_dir = torch.tensor(
+                [[1.0, 0.0, 0.0]], device=self.device
+            )
 
         elif self.config["motion"] == "predefined":
             intrinsics = np.load(self.config["intrinsics"]).astype(np.float32)
@@ -109,7 +126,12 @@ class WarpInpaintModel(torch.nn.Module):
             Rs = Rs.movedim(1, 2)
 
             self.predefined_cameras = [
-                PerspectiveCameras(K=K.unsqueeze(0), R=R.T.unsqueeze(0), T=t.unsqueeze(0), device=self.device)
+                PerspectiveCameras(
+                    K=K.unsqueeze(0),
+                    R=R.T.unsqueeze(0),
+                    T=t.unsqueeze(0),
+                    device=self.device,
+                )
                 for K, R, t in zip(Ks, Rs, ts)
             ]
             self.current_camera = self.predefined_cameras[0]
@@ -132,7 +154,9 @@ class WarpInpaintModel(torch.nn.Module):
             self.big_warped_images = []
 
         self.latent_storer = LatentStorer()
-        self.vae = AutoencoderKL.from_pretrained(config["stable_diffusion_checkpoint"], subfolder="vae").to(self.device)
+        self.vae = AutoencoderKL.from_pretrained(
+            config["stable_diffusion_checkpoint"], subfolder="vae"
+        ).to(self.device)
         self.decoder_copy = copy.deepcopy(self.vae.decoder)
 
         self.video_direction = -1
@@ -144,20 +168,40 @@ class WarpInpaintModel(torch.nn.Module):
         self.current_colors = None
         self.current_triangles = None
 
-        self.classifier_free_guidance_scale = self.config["classifier_free_guidance_scale"]
+        self.classifier_free_guidance_scale = self.config[
+            "classifier_free_guidance_scale"
+        ]
 
         assert self.config["inpainting_resolution"] >= 512
         # create mask for inpainting of the right size, white area around the image in the middle
         self.border_mask = torch.ones(
-            (1, 1, self.config["inpainting_resolution"], self.config["inpainting_resolution"])
+            (
+                1,
+                1,
+                self.config["inpainting_resolution"],
+                self.config["inpainting_resolution"],
+            )
         ).to(self.device)
         self.border_size = (self.config["inpainting_resolution"] - 512) // 2
-        self.border_mask[:, :, self.border_size : -self.border_size, self.border_size : -self.border_size] = 0
+        self.border_mask[
+            :,
+            :,
+            self.border_size : -self.border_size,
+            self.border_size : -self.border_size,
+        ] = 0
         self.border_image = torch.zeros(
-            1, 3, self.config["inpainting_resolution"], self.config["inpainting_resolution"]
+            1,
+            3,
+            self.config["inpainting_resolution"],
+            self.config["inpainting_resolution"],
         ).to(self.device)
         self.images_orig_decoder = [
-            Resize((self.config["inpainting_resolution"], self.config["inpainting_resolution"]))(self.image_tensor)
+            Resize(
+                (
+                    self.config["inpainting_resolution"],
+                    self.config["inpainting_resolution"],
+                )
+            )(self.image_tensor)
         ]
 
         boundaries_mask = self.get_boundaries_mask(self.disparity)
@@ -173,9 +217,19 @@ class WarpInpaintModel(torch.nn.Module):
         else:
             aa_factor = self.config["antialiasing_factor"]
             self.renderer = Renderer(config, image_size=512)
-            self.aa_renderer = Renderer(config, image_size=512 * aa_factor, antialiasing_factor=aa_factor)
-            self.big_image_renderer = Renderer(config, image_size=512 * (aa_factor + 1), antialiasing_factor=aa_factor)
-            self.update_mesh(self.image_tensor, self.depth, mesh_mask, self.get_extrinsics(self.current_camera), 0)
+            self.aa_renderer = Renderer(
+                config, image_size=512 * aa_factor, antialiasing_factor=aa_factor
+            )
+            self.big_image_renderer = Renderer(
+                config, image_size=512 * (aa_factor + 1), antialiasing_factor=aa_factor
+            )
+            self.update_mesh(
+                self.image_tensor,
+                self.depth,
+                mesh_mask,
+                self.get_extrinsics(self.current_camera),
+                0,
+            )
 
     def save_mesh(self, name):
         full_mesh = trimesh.Trimesh(
@@ -197,13 +251,17 @@ class WarpInpaintModel(torch.nn.Module):
 
         if depth_discontinuity_points is not None:
             depth_discontinuity_mask = (
-                torch.isin(self.current_triangles, depth_discontinuity_points).any(dim=1)
+                torch.isin(self.current_triangles, depth_discontinuity_points).any(
+                    dim=1
+                )
                 if self.config["mesh_exclude_boundaries"]
                 else None
             )
         # remove stretched triangles
         if self.config["min_triangle_angle"] > 0:
-            min_angles = self.renderer.get_triangles_min_angle_degree(self.current_points_3d, self.current_triangles)
+            min_angles = self.renderer.get_triangles_min_angle_degree(
+                self.current_points_3d, self.current_triangles
+            )
             bad_angles_mask = min_angles < self.config["min_triangle_angle"]
             if depth_discontinuity_mask is not None:
                 bad_angles_mask = bad_angles_mask & depth_discontinuity_mask
@@ -226,19 +284,33 @@ class WarpInpaintModel(torch.nn.Module):
         for i, c in enumerate(connected_components):
             if lens[i] >= self.config["min_connected_component_size"]:
                 good_faces = (
-                    torch.cat((good_faces, torch.from_numpy(c))) if good_faces is not None else torch.from_numpy(c)
+                    torch.cat((good_faces, torch.from_numpy(c)))
+                    if good_faces is not None
+                    else torch.from_numpy(c)
                 )
-        self.current_triangles = torch.tensor(mesh.faces[good_faces], device=self.device)
-        self.current_points_3d = torch.tensor(mesh.vertices, device=self.device, dtype=torch.float32)
-        self.current_colors = torch.tensor(mesh.visual.vertex_colors[:, :3], device=self.device) / 255
+        self.current_triangles = torch.tensor(
+            mesh.faces[good_faces], device=self.device
+        )
+        self.current_points_3d = torch.tensor(
+            mesh.vertices, device=self.device, dtype=torch.float32
+        )
+        self.current_colors = (
+            torch.tensor(mesh.visual.vertex_colors[:, :3], device=self.device) / 255
+        )
 
-    def filter_faces_by_normals(self, triangles, vertices, depth_discontinuity_mask=None):
+    def filter_faces_by_normals(
+        self, triangles, vertices, depth_discontinuity_mask=None
+    ):
         normals = self.renderer.get_normals(vertices, triangles)
         vertices_triangles = vertices[triangles]
         centers = vertices_triangles.mean(dim=1)
-        camera_center = (-self.current_camera.R[0].T @ self.current_camera.T.transpose(0, 1)).T
+        camera_center = (
+            -self.current_camera.R[0].T @ self.current_camera.T.transpose(0, 1)
+        ).T
         viewing_directions = centers - camera_center[0]
-        viewing_directions = viewing_directions / viewing_directions.norm(dim=-1, keepdim=True)
+        viewing_directions = viewing_directions / viewing_directions.norm(
+            dim=-1, keepdim=True
+        )
         dot_product = (normals * viewing_directions).sum(dim=-1)
         bad_faces_mask = dot_product >= self.config["normal_filtering_threshold"]
         if depth_discontinuity_mask is not None:
@@ -257,7 +329,9 @@ class WarpInpaintModel(torch.nn.Module):
         if self.config["mesh_exclude_boundaries"]:
             disp_boundaries_mask = self.get_boundaries_mask(1 / depth)
             boundaries_mask = disp_boundaries_mask.float()
-            boundaries_mask = dilation(boundaries_mask, torch.ones(5, 5, device=self.device)).bool()
+            boundaries_mask = dilation(
+                boundaries_mask, torch.ones(5, 5, device=self.device)
+            ).bool()
             self.depth_discontinuities_masks.append(boundaries_mask)
         else:
             boundaries_mask = None
@@ -270,35 +344,53 @@ class WarpInpaintModel(torch.nn.Module):
             starting_index=starting_index,
             depth_boundaries_mask=boundaries_mask,
         )
-        points_3d, colors, triangles = mesh_dict["points_3d"], mesh_dict["colors"], mesh_dict["triangles"]
+        points_3d, colors, triangles = (
+            mesh_dict["points_3d"],
+            mesh_dict["colors"],
+            mesh_dict["triangles"],
+        )
 
         if self.current_colors is None:
             self.current_colors = colors
             self.current_points_3d = points_3d
             if self.config["normal_filtering_threshold"]:
                 depth_discontinuity_mask = (
-                    torch.isin(triangles, mesh_dict["depth_discontinuity_points"]).any(dim=1)
+                    torch.isin(triangles, mesh_dict["depth_discontinuity_points"]).any(
+                        dim=1
+                    )
                     if self.config["mesh_exclude_boundaries"]
                     else None
                 )
-                triangles = self.filter_faces_by_normals(triangles, self.current_points_3d, depth_discontinuity_mask)
+                triangles = self.filter_faces_by_normals(
+                    triangles, self.current_points_3d, depth_discontinuity_mask
+                )
             self.current_triangles = triangles
         else:
             self.current_colors = torch.cat([self.current_colors, colors], dim=0)
-            self.current_points_3d = torch.cat([self.current_points_3d, points_3d], dim=0)
+            self.current_points_3d = torch.cat(
+                [self.current_points_3d, points_3d], dim=0
+            )
             if self.config["normal_filtering_threshold"]:
                 depth_discontinuity_mask = (
-                    torch.isin(triangles, mesh_dict["depth_discontinuity_points"]).any(dim=1)
+                    torch.isin(triangles, mesh_dict["depth_discontinuity_points"]).any(
+                        dim=1
+                    )
                     if self.config["mesh_exclude_boundaries"]
                     else None
                 )
-                triangles = self.filter_faces_by_normals(triangles, self.current_points_3d, depth_discontinuity_mask)
-            self.current_triangles = torch.cat([self.current_triangles, triangles], dim=0)
+                triangles = self.filter_faces_by_normals(
+                    triangles, self.current_points_3d, depth_discontinuity_mask
+                )
+            self.current_triangles = torch.cat(
+                [self.current_triangles, triangles], dim=0
+            )
 
         self.clean_mesh(
-            depth_discontinuity_points=mesh_dict["depth_discontinuity_points"]
-            if self.config["mesh_exclude_boundaries"]
-            else None
+            depth_discontinuity_points=(
+                mesh_dict["depth_discontinuity_points"]
+                if self.config["mesh_exclude_boundaries"]
+                else None
+            )
         )
 
     @staticmethod
@@ -331,13 +423,18 @@ class WarpInpaintModel(torch.nn.Module):
         K[0, 3, 2] = 1
         R = torch.eye(3, device=self.device).unsqueeze(0)
         T = torch.zeros((1, 3), device=self.device)
-        camera = PerspectiveCameras(K=K, R=R, T=T, in_ndc=False, image_size=((512, 512),), device=self.device)
+        camera = PerspectiveCameras(
+            K=K, R=R, T=T, in_ndc=False, image_size=((512, 512),), device=self.device
+        )
         return camera
 
     def get_boundaries_mask(self, disparity):
-        normalized_disparity = (disparity - disparity.min()) / (disparity.max() - disparity.min() + 1e-6)
+        normalized_disparity = (disparity - disparity.min()) / (
+            disparity.max() - disparity.min() + 1e-6
+        )
         return (
-            sobel_filter(normalized_disparity, "sobel", beta=self.config["sobel_beta"]) < self.config["sobel_threshold"]
+            sobel_filter(normalized_disparity, "sobel", beta=self.config["sobel_beta"])
+            < self.config["sobel_threshold"]
         )
 
     def inpaint_cv2(self, warped_image, mask_diff):
@@ -354,7 +451,9 @@ class WarpInpaintModel(torch.nn.Module):
         if self.config["motion"] == "rotations":
             camera = self.get_next_camera_rotation()
         elif self.config["motion"] == "translations":
-            camera = self.get_next_camera_translation(self.disparities[epoch - 1], epoch)
+            camera = self.get_next_camera_translation(
+                self.disparities[epoch - 1], epoch
+            )
         elif self.config["motion"] == "round":
             camera = self.get_next_camera_round(epoch)
         elif self.config["motion"] == "predefined":
@@ -363,7 +462,9 @@ class WarpInpaintModel(torch.nn.Module):
             raise NotImplementedError
         next_camera = self.convert_pytorch3d_kornia(camera)
         current_camera = self.convert_pytorch3d_kornia(self.current_camera)
-        points_3d = current_camera.unproject(self.points, rearrange(self.depths[epoch - 1], "b c h w -> (w h b) c"))
+        points_3d = current_camera.unproject(
+            self.points, rearrange(self.depths[epoch - 1], "b c h w -> (w h b) c")
+        )
         P = next_camera.intrinsics @ next_camera.extrinsics
         transformed_points = transform_points(P, points_3d)
         transformed_z = transformed_points[:, [2]]
@@ -374,16 +475,31 @@ class WarpInpaintModel(torch.nn.Module):
         importance = 1.0 / (transformed_z)
         importance_min = importance.amin(keepdim=True)
         importance_max = importance.amax(keepdim=True)
-        weights = (importance - importance_min) / (importance_max - importance_min + 1e-6) * 20 - 10
+        weights = (importance - importance_min) / (
+            importance_max - importance_min + 1e-6
+        ) * 20 - 10
         weights = rearrange(weights, "(w h b) c -> b c h w", w=512, h=512)
 
-        transformed_z_tensor = rearrange(transformed_z, "(w h b) c -> b c h w", w=512, h=512)
+        transformed_z_tensor = rearrange(
+            transformed_z, "(w h b) c -> b c h w", w=512, h=512
+        )
         inpaint_mask = torch.ones_like(transformed_z_tensor)
         boundaries_mask = self.get_boundaries_mask(self.disparities[epoch - 1])
 
-        input_data = torch.cat([self.images[epoch - 1], transformed_z_tensor, inpaint_mask, boundaries_mask], 1)
+        input_data = torch.cat(
+            [
+                self.images[epoch - 1],
+                transformed_z_tensor,
+                inpaint_mask,
+                boundaries_mask,
+            ],
+            1,
+        )
         output_data = softsplat.softsplat(
-            tenIn=input_data, tenFlow=flow_tensor, tenMetric=weights.detach(), strMode="soft"
+            tenIn=input_data,
+            tenFlow=flow_tensor,
+            tenMetric=weights.detach(),
+            strMode="soft",
         )
         warped_image = output_data[:, 0:3, ...].clip(0, 1)
         warped_depth = output_data[:, 3:4, ...]
@@ -406,11 +522,17 @@ class WarpInpaintModel(torch.nn.Module):
         if self.config["inpainting_resolution"] > 512:
             padded_inpainting_mask = self.border_mask.clone()
             padded_inpainting_mask[
-                :, :, self.border_size : -self.border_size, self.border_size : -self.border_size
+                :,
+                :,
+                self.border_size : -self.border_size,
+                self.border_size : -self.border_size,
             ] = inpaint_mask
             padded_image = self.border_image.clone()
             padded_image[
-                :, :, self.border_size : -self.border_size, self.border_size : -self.border_size
+                :,
+                :,
+                self.border_size : -self.border_size,
+                self.border_size : -self.border_size,
             ] = warped_image
         else:
             padded_inpainting_mask = inpaint_mask
@@ -456,22 +578,38 @@ class WarpInpaintModel(torch.nn.Module):
         if self.config["antialiasing_factor"] > 1:
             self.aa_renderer.renderer.rasterizer.raster_settings.blur_radius = 1e-3
             prev_image, _, prev_depth, _, _ = self.aa_renderer.sample_points(
-                self.current_points_3d, self.current_triangles, self.current_colors, cur_camera
+                self.current_points_3d,
+                self.current_triangles,
+                self.current_colors,
+                cur_camera,
             )
-            self.aa_renderer.renderer.rasterizer.raster_settings.blur_radius = self.config["blur_radius"]
+            self.aa_renderer.renderer.rasterizer.raster_settings.blur_radius = (
+                self.config["blur_radius"]
+            )
         big_resolution = (self.config["antialiasing_factor"] + 1) * 512
         border_size = (big_resolution - self.config["antialiasing_factor"] * 512) // 2
         pad_value = 0
         big_image = F.pad(
-            prev_image, (border_size, border_size, border_size, border_size), mode="constant", value=pad_value
+            prev_image,
+            (border_size, border_size, border_size, border_size),
+            mode="constant",
+            value=pad_value,
         )
-        border_mask = torch.ones((1, 1, big_resolution, big_resolution), device=self.device)
+        border_mask = torch.ones(
+            (1, 1, big_resolution, big_resolution), device=self.device
+        )
         border_mask[0, 0, border_size:-border_size, border_size:-border_size] = 0
-        big_depth = F.pad(prev_depth, (border_size, border_size, border_size, border_size), mode="replicate")
+        big_depth = F.pad(
+            prev_depth,
+            (border_size, border_size, border_size, border_size),
+            mode="replicate",
+        )
 
         updated_depth = big_depth.clone()
         updated_depth[~border_mask.bool()] = -1
-        mesh_border_dict = self.big_image_renderer.unproject_points(updated_depth, big_image, cur_camera)
+        mesh_border_dict = self.big_image_renderer.unproject_points(
+            updated_depth, big_image, cur_camera
+        )
         border_colors, border_points_3d, border_triangles = (
             mesh_border_dict["colors"],
             mesh_border_dict["points_3d"],
@@ -481,7 +619,9 @@ class WarpInpaintModel(torch.nn.Module):
             border_points_3d, border_triangles, border_colors, extrinsic
         )
         add_to_mask = (border_warped_image == pad_value)[:, [0]].float()
-        add_to_mask = add_to_mask[:, :, border_size:-border_size, border_size:-border_size]
+        add_to_mask = add_to_mask[
+            :, :, border_size:-border_size, border_size:-border_size
+        ]
         kernel = torch.ones((3, 3), device=self.device)
         add_to_mask = dilation(add_to_mask, kernel)
         return add_to_mask
@@ -492,8 +632,12 @@ class WarpInpaintModel(torch.nn.Module):
         input_image[(mask == 0).repeat(1, n, 1, 1)] = 0
         k_s = self.config["antialiasing_factor"] * 2 - 1
         padding = (k_s - 1) // 2
-        sums = F.avg_pool2d(input_image, stride=1, padding=padding, kernel_size=k_s, divisor_override=1)
-        counts = F.avg_pool2d(mask.float(), stride=1, padding=padding, kernel_size=k_s, divisor_override=1)
+        sums = F.avg_pool2d(
+            input_image, stride=1, padding=padding, kernel_size=k_s, divisor_override=1
+        )
+        counts = F.avg_pool2d(
+            mask.float(), stride=1, padding=padding, kernel_size=k_s, divisor_override=1
+        )
         blurred = sums / counts
         blurred[(mask == 0).repeat(1, n, 1, 1)] = put_in_mask
         stride = self.config["antialiasing_factor"]
@@ -506,7 +650,9 @@ class WarpInpaintModel(torch.nn.Module):
             if self.config["motion"] == "rotations":
                 camera = self.get_next_camera_rotation()
             elif self.config["motion"] == "translations":
-                camera = self.get_next_camera_translation(self.disparities[epoch - 1], epoch)
+                camera = self.get_next_camera_translation(
+                    self.disparities[epoch - 1], epoch
+                )
             elif self.config["motion"] == "round":
                 camera = self.get_next_camera_round(epoch)
             elif self.config["motion"] == "predefined":
@@ -515,8 +661,13 @@ class WarpInpaintModel(torch.nn.Module):
                 raise NotImplementedError
         extrinsic = self.get_extrinsics(camera)
 
-        warped_image, inpaint_mask, warped_depth, closest_faces, fragments = self.aa_renderer.sample_points(
-            self.current_points_3d, self.current_triangles, self.current_colors, extrinsic
+        warped_image, inpaint_mask, warped_depth, closest_faces, fragments = (
+            self.aa_renderer.sample_points(
+                self.current_points_3d,
+                self.current_triangles,
+                self.current_colors,
+                extrinsic,
+            )
         )
 
         warped_image = warped_image.clip(0, 1)
@@ -541,8 +692,8 @@ class WarpInpaintModel(torch.nn.Module):
             closest_faces = closest_faces[::stride, ::stride]
 
         mesh_boundaries_mask = self.get_mesh_boundaries_mask(inpaint_mask)
-        boundary_xs, boundary_ys, boundary_closest_points = self.get_closest_boundary_points(
-            mesh_boundaries_mask, closest_faces
+        boundary_xs, boundary_ys, boundary_closest_points = (
+            self.get_closest_boundary_points(mesh_boundaries_mask, closest_faces)
         )
         self.boundary_points_dict[epoch] = {
             "xs": boundary_xs,
@@ -572,11 +723,17 @@ class WarpInpaintModel(torch.nn.Module):
         if self.config["inpainting_resolution"] > 512:
             padded_inpainting_mask = self.border_mask.clone()
             padded_inpainting_mask[
-                :, :, self.border_size : -self.border_size, self.border_size : -self.border_size
+                :,
+                :,
+                self.border_size : -self.border_size,
+                self.border_size : -self.border_size,
             ] = inpaint_mask
             padded_image = self.border_image.clone()
             padded_image[
-                :, :, self.border_size : -self.border_size, self.border_size : -self.border_size
+                :,
+                :,
+                self.border_size : -self.border_size,
+                self.border_size : -self.border_size,
             ] = warped_image
         else:
             padded_inpainting_mask = inpaint_mask
@@ -611,11 +768,15 @@ class WarpInpaintModel(torch.nn.Module):
         loss = (loss * full_mask)[full_mask > 0].mean()
         return loss
 
-    def finetune_decoder_step(self, inpainted_image, inpainted_image_latent, warped_image, inpaint_mask):
+    def finetune_decoder_step(
+        self, inpainted_image, inpainted_image_latent, warped_image, inpaint_mask
+    ):
         reconstruction = self.decode_latents(inpainted_image_latent)
         loss = (
             F.mse_loss(inpainted_image * inpaint_mask, reconstruction * inpaint_mask)
-            + F.mse_loss(warped_image * (1 - inpaint_mask), reconstruction * (1 - inpaint_mask))
+            + F.mse_loss(
+                warped_image * (1 - inpaint_mask), reconstruction * (1 - inpaint_mask)
+            )
             * self.config["preservation_weight"]
         )
         return loss
@@ -642,7 +803,11 @@ class WarpInpaintModel(torch.nn.Module):
         inpainted_image = ToTensor()(inpainted_image).unsqueeze(0).to(self.device)
         latent = latent.float()
 
-        return {"inpainted_image": inpainted_image, "latent": latent, "best_index": best_index}
+        return {
+            "inpainted_image": inpainted_image,
+            "latent": latent,
+            "best_index": best_index,
+        }
 
     @torch.no_grad()
     def update_depth(self, inpainted_image):
@@ -655,10 +820,16 @@ class WarpInpaintModel(torch.nn.Module):
         # take center crop of 512*512
         if self.config["inpainting_resolution"] > 512:
             decoded_image = decoded_image[
-                :, :, self.border_size : -self.border_size, self.border_size : -self.border_size
+                :,
+                :,
+                self.border_size : -self.border_size,
+                self.border_size : -self.border_size,
             ]
             inpaint_mask = inpaint_mask[
-                :, :, self.border_size : -self.border_size, self.border_size : -self.border_size
+                :,
+                :,
+                self.border_size : -self.border_size,
+                self.border_size : -self.border_size,
             ]
         else:
             decoded_image = decoded_image
@@ -684,7 +855,9 @@ class WarpInpaintModel(torch.nn.Module):
 
         next_camera = copy.deepcopy(self.current_camera)
         center = torch.tensor([[0.0, 0.0, r / 2]])
-        theta = torch.deg2rad((torch.tensor(epoch) * 360.0 / self.config["full_circle_epochs"]) % 360)
+        theta = torch.deg2rad(
+            (torch.tensor(epoch) * 360.0 / self.config["full_circle_epochs"]) % 360
+        )
         x = torch.sin(theta)
         y = 0
         z = torch.cos(theta)
@@ -692,17 +865,28 @@ class WarpInpaintModel(torch.nn.Module):
         total_t = center + r_vector
         total_t = total_t.to(self.device).float()
         next_camera.T = total_t
-        next_camera.R = look_at_rotation(next_camera.T, at=(center[0].tolist(),)).to(self.device)
+        next_camera.R = look_at_rotation(next_camera.T, at=(center[0].tolist(),)).to(
+            self.device
+        )
         return next_camera
 
     def get_next_camera_translation(self, disparity, epoch):
         next_camera = copy.deepcopy(self.current_camera)
         if epoch % self.config["change_translation_every"] == 0:
-            next_camera.translating_right = -1 if (next_camera.translating_right == 1) else 1
+            next_camera.translating_right = (
+                -1 if (next_camera.translating_right == 1) else 1
+            )
 
         median_disparity = torch.median(disparity)
-        translation_speed_factor = (median_disparity / self.initial_median_disparity).clip(min=None, max=1)
-        speed = translation_speed_factor * self.camera_speed_factor * next_camera.translating_right * 0.1875
+        translation_speed_factor = (
+            median_disparity / self.initial_median_disparity
+        ).clip(min=None, max=1)
+        speed = (
+            translation_speed_factor
+            * self.camera_speed_factor
+            * next_camera.translating_right
+            * 0.1875
+        )
         next_camera.T += speed * self.current_camera.move_dir
 
         return next_camera
@@ -717,9 +901,15 @@ class WarpInpaintModel(torch.nn.Module):
                 next_camera.rotating = False
                 next_camera.rotations_count = 0
 
-            theta = torch.tensor(self.config["rotation_range"] * next_camera.rotating_right)
+            theta = torch.tensor(
+                self.config["rotation_range"] * next_camera.rotating_right
+            )
             rotation_matrix = torch.tensor(
-                [[torch.cos(theta), 0, torch.sin(theta)], [0, 1, 0], [-torch.sin(theta), 0, torch.cos(theta)]],
+                [
+                    [torch.cos(theta), 0, torch.sin(theta)],
+                    [0, 1, 0],
+                    [-torch.sin(theta), 0, torch.cos(theta)],
+                ],
                 device=self.device,
             )
             next_camera.R[0] = rotation_matrix @ next_camera.R[0]
@@ -730,7 +920,9 @@ class WarpInpaintModel(torch.nn.Module):
             if next_camera.no_rotations_count > self.config["no_rotations_steps"]:
                 next_camera.no_rotations_count = 0
                 next_camera.rotating = True
-                next_camera.rotating_right = 1 if (next_camera.rotating_right == -1) else -1
+                next_camera.rotating_right = (
+                    1 if (next_camera.rotating_right == -1) else -1
+                )
 
         # move camera backwards
         speed = self.camera_speed_factor * 0.1875

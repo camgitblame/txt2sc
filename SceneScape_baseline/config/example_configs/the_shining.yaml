@@ -1,0 +1,5 @@
+runs_dir: output
+seed: 13
+frames: 30
+
+inpainting_prompt: "POV, walkthrough, Overlook Hotel hallway, the shining, masterpiece, indoor scene, best quality"

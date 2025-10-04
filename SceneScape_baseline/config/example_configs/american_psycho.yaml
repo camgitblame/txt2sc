@@ -1,0 +1,6 @@
+# Scene Scape baseline config for American Psycho
+runs_dir: output
+seed: 13
+frames: 30
+
+inpainting_prompt: "POV, walkthrough, Patrick Bateman's apartment, American Psycho, masterpiece, indoor scene, best quality"
