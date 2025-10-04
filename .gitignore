@@ -18,7 +18,6 @@ cuda related/check_cuda.py
 cuda related/check_cuda.sh
 install-pytorch.sh
 setup_env.sh
-StyleScape/
 mask/
 warp_images/
 output/

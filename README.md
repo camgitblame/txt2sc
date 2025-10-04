@@ -8,13 +8,24 @@ This project presents a text-to-3D pipeline that generates aesthetically pleasin
 ### Project Structure
 
 ```
-├── Text2scene/                    # Main pipeline with DreamBooth and ControlNet integration
-├── SceneScape_baseline/           # Baseline (SceneScape)
-├── dreambooth_training/           # DreamBooth training scripts 
-├── generation_sampler/            # Generation scripts to test DreamBooth checkpoints
-├── notebook/                      # Notebooks for computing quatitative metrics, visualizing data, sample frames and output video frames 
-├── setup/                         # Environment config and dependencies
-
+├── Text2scene/                              # Main pipeline with DreamBooth and ControlNet integration
+│   ├── config/                              # Config files to run DB+CN models for each scene
+│   │   ├── thesubstance_DB1CN_config.yaml   # Example config file for DB+1CN 
+│   │   └── thesubstance_DB2CN_config.yaml   # Example config file for DB+2CN
+│   ├── models/                              # Implementation files
+│   │   ├── warp_inpaint_model_controlnet.py # WarpInpaint Model Script
+│   │   └── warp_fix.py                      # DepthControlNet and Stabilizers Integration Script       
+│   ├── run_text2scene.py                    # Main execution script for Text2Scene pipeline
+│   └── run_text2scene.sh                    # Shell script for running pipeline
+├── SceneScape_baseline/                     # Baseline (SceneScape)
+│   ├── config/                              # Config files to run baseline model for each scene
+│   ├── models/                              # Baseline model implementations 
+│   └── run.py                               # Baseline execution script
+├── dreambooth_training/                     # DreamBooth training scripts 
+├── generation_sampler/                      # Generation scripts to test DreamBooth checkpoints
+├── notebook/                                # Notebooks for computing quantitative metrics, visualizing data, 
+│                                            # sample frames and output video frames 
+└── setup/                                   # Environment config and dependencies
 ```
 
 
