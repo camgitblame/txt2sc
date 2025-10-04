@@ -239,6 +239,43 @@ function App() {
       <Carousel arrows className={styles.carousel} afterChange={onChange}>
         <div className={styles.contentStyle}>
           <h2>
+            The Overlook Hotel hallway from <span className={styles.italic}>The Shining (1980)</span>
+          </h2>
+          <div className={styles.carouselContentFlex}>
+            <div className={styles.carouselContentDivOne}>
+              <h3>DreamBooth Training Images</h3>
+              <img 
+                src={shiningTrain1} 
+                alt="The Shining training 1" 
+                className={styles.trainingImage}
+              />
+              <img 
+                src={shiningTrain2} 
+                alt="The Shining training 2" 
+                className={styles.trainingImage}
+              />
+              <img 
+                src={shiningTrain3} 
+                alt="The Shining training 3" 
+                className={styles.trainingImage}
+              />
+            </div>
+            <div className={styles.carouselContentDivTwo}>
+              <h3>Generated Walkthrough Video</h3>
+              <video 
+                src={shiningVideo}
+                controls
+                muted
+                loop
+                style={{ width: '100%', maxWidth: '500px', height: 'auto' }}
+              >
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
+        </div>
+        <div className={styles.contentStyle}>
+          <h2>
             The Nostromo corridor from <span className={styles.italic}>Alien (1979)</span>
           </h2>
           <div className={styles.carouselContentFlex}>
@@ -302,43 +339,6 @@ function App() {
               <h3>Generated Walkthrough Video</h3>
               <video 
                 src={asVideo}
-                controls
-                muted
-                loop
-                style={{ width: '100%', maxWidth: '500px', height: 'auto' }}
-              >
-                Your browser does not support the video tag.
-              </video>
-            </div>
-          </div>
-        </div>
-        <div className={styles.contentStyle}>
-          <h2>
-            The Overlook Hotel hallway from <span className={styles.italic}>The Shining (1980)</span>
-          </h2>
-          <div className={styles.carouselContentFlex}>
-            <div className={styles.carouselContentDivOne}>
-              <h3>DreamBooth Training Images</h3>
-              <img 
-                src={shiningTrain1} 
-                alt="The Shining training 1" 
-                className={styles.trainingImage}
-              />
-              <img 
-                src={shiningTrain2} 
-                alt="The Shining training 2" 
-                className={styles.trainingImage}
-              />
-              <img 
-                src={shiningTrain3} 
-                alt="The Shining training 3" 
-                className={styles.trainingImage}
-              />
-            </div>
-            <div className={styles.carouselContentDivTwo}>
-              <h3>Generated Walkthrough Video</h3>
-              <video 
-                src={shiningVideo}
                 controls
                 muted
                 loop
