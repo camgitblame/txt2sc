@@ -2,17 +2,16 @@
 
 ## Overview
 
-This project generates cinematic 3D scene walkthroughs from text descriptions by combining Stable Diffusion 3 with DreamBooth training. Built upon the SceneScape framework, it creates depth-consistent movie environments with enhanced visual quality and geometric consistency across frames.
+This project generates 3D scene walkthroughs for movies from text by combining Stable Diffusion with DreamBooth and multi-ControlNet setup. Built upon the SceneScape framework, it creates depth-consistent movie environments with enhanced visual quality and geometric consistency across frames.
 
 
 ### Project Structure
 
 ```
-├── Text2scene/                    # Main generation pipeline with DreamBooth and ControlNet integration
-├── SceneScape_baseline/           # Original baseline (SceneScape) implementation
+├── Text2scene/                    # Main pipeline with DreamBooth and ControlNet integration
+├── SceneScape_baseline/           # Baseline (SceneScape)
 ├── dreambooth_training/           # DreamBooth training scripts 
-├── generation_sampler/            # Standalone generation scripts
-├── data/                          # Training datasets and movie scene references
+├── generation_sampler/            # Generation scripts to test DreamBooth checkpoints
 ├── setup/                         # Environment config and dependencies
 
 ```
