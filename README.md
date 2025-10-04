@@ -1,4 +1,4 @@
-# Text2Scene
+# Text-to-3D Scene Generation for Movie Walkthrough Videos
 
 ## Overview
 
