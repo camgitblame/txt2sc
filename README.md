@@ -17,19 +17,19 @@ The output videos of all models are available in our project pages.
 ```
 ├── Text2scene/                              # Main pipeline with DreamBooth and ControlNet integration
 │   ├── config/                              # Config files to run DB+CN models for each scene
-│   │   ├── base-config.yaml                 # Base configuration file
+│   │   ├── base-config.yaml                 # Base config file
 │   │   └── example_configs/                 # Config files for different scenes
 │   │       ├── thesubstance_DB1CN_config.yaml   # Example config file for DB+1CN 
 │   │       └── thesubstance_DB2CN_config.yaml   # Example config file for DB+2CN
-│   ├── models/                              # Implementation files
+│   ├── models/                              
 │   │   ├── warp_inpaint_model_controlnet.py # WarpInpaint Model - Scene Generation Script
 │   │   └── warp_fix.py                      # DepthControlNet and Stabilizers Integration Script       
 │   ├── run_text2scene.py                    # Main execution script for Text2Scene pipeline
 │   └── run_thesubstance_DB1CN.sh            # Example shell script to run pipeline and generate scene 
 │                                            # with the model DB+1CN for The Substance
-├── SceneScape_baseline/                     # Baseline (SceneScape)
+├── SceneScape_baseline/                     
 │   ├── config/                              # Config files to run baseline model for each scene
-│   ├── models/                              # Baseline model implementations 
+│   ├── models/                              
 │   └── run.py                               # Baseline execution script
 ├── dreambooth_training/                     # DreamBooth training scripts 
 ├── generation_sampler/                      # Generation scripts to test DreamBooth checkpoints
