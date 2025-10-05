@@ -1,7 +1,7 @@
 import * as styles from "./App.css.ts";
 import { Carousel } from "antd";
 import "./App.css";
-import { Github, ScrollText, Play } from "lucide-react";
+import { Github, ScrollText, Play, Database, X } from "lucide-react";
 import { useState } from "react";
 
 // Import training images
@@ -16,6 +16,8 @@ import asTrain3 from "./assets/american_psycho/train3.png";
 import shiningTrain1 from "./assets/the_shining/train1.jpg";
 import shiningTrain2 from "./assets/the_shining/train2.jpg";
 import shiningTrain3 from "./assets/the_shining/train3.jpg";
+import shiningTrain4 from "./assets/the_shining/train4.png";
+import shiningTrain5 from "./assets/the_shining/train5.png";
 
 import pasTrain1 from "./assets/passengers/train1.jpg";
 import pasTrain2 from "./assets/passengers/train2.jpg";
@@ -55,9 +57,152 @@ import substanceDb2cn from "./assets/substance/video_db_2cn.mp4";
 
 function App() {
   const [currentView, setCurrentView] = useState('main');
+  const [zoomedImage, setZoomedImage] = useState(null);
   
   const onChange = (currentSlide) => {
     console.log(currentSlide);
+  };
+
+  const renderDataPage = () => {
+    const movies = [
+      { name: "The Shining", subtitle: "The Overlook Hotel hallway" },
+      { name: "The Substance", subtitle: "Elisabeth Sparkle's apartment" },
+      { name: "American Psycho", subtitle: "Patrick Bateman's apartment" },
+      { name: "Passengers", subtitle: "The Vienna Suite" },
+      { name: "Alien", subtitle: "The Nostromo corridor" }
+    ];
+
+    // Training images mapping - you'll need to import additional images
+    const trainingImagesMap = {
+      "The Shining": [shiningTrain1, shiningTrain2, shiningTrain3, shiningTrain4, shiningTrain5],
+      "The Substance": [subTrain1, subTrain2, subTrain3],
+      "American Psycho": [asTrain1, asTrain2, asTrain3],
+      "Passengers": [pasTrain1, pasTrain2, pasTrain3],
+      "Alien": [alienTrain1, alienTrain2, alienTrain3]
+    };
+
+    return (
+      <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "20px" }}>
+        <div className={styles.abstract} style={{ marginBottom: "40px" }}>
+          <h2>Training Data</h2>
+          <p style={{ marginBottom: "20px" }}>
+            DreamBooth training images extracted from each movie to capture the distinctive visual style and characteristics of each scene. Click on any image to view full size.
+          </p>
+        </div>
+
+        {movies.map((movie, movieIndex) => (
+          <div key={movie.name} style={{ marginBottom: "60px" }}>
+            <h2 style={{ textAlign: "center", marginBottom: "30px" }}>
+              {movie.name} - <span className={styles.italic}>{movie.subtitle}</span>
+            </h2>
+            <div style={{ 
+              display: "grid", 
+              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", 
+              gap: "20px",
+              maxWidth: "1200px",
+              margin: "0 auto"
+            }}>
+              {trainingImagesMap[movie.name].map((image, imageIndex) => (
+                <div 
+                  key={imageIndex} 
+                  style={{ 
+                    textAlign: "center",
+                    cursor: "pointer",
+                    transition: "transform 0.2s ease"
+                  }}
+                  onClick={() => setZoomedImage(image)}
+                  onMouseEnter={(e) => e.target.style.transform = "scale(1.05)"}
+                  onMouseLeave={(e) => e.target.style.transform = "scale(1)"}
+                >
+                  <img
+                    src={image}
+                    alt={`${movie.name} training ${imageIndex + 1}`}
+                    style={{
+                      width: "100%",
+                      aspectRatio: "1 / 1",
+                      borderRadius: "8px",
+                      objectFit: "cover",
+                      border: "2px solid #666",
+                      backgroundColor: "#2a2a2a",
+                      transition: "transform 0.2s ease, box-shadow 0.2s ease"
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.boxShadow = "0 8px 25px rgba(255, 255, 255, 0.1)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.boxShadow = "none";
+                    }}
+                  />
+                  <p style={{ 
+                    marginTop: "10px", 
+                    fontSize: "14px", 
+                    color: "#ccc" 
+                  }}>
+                    Training Image {imageIndex + 1}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+
+        {/* Image Zoom Modal */}
+        {zoomedImage && (
+          <div 
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0, 0, 0, 0.9)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 1000,
+              cursor: "pointer"
+            }}
+            onClick={() => setZoomedImage(null)}
+          >
+            <button
+              style={{
+                position: "absolute",
+                top: "20px",
+                right: "20px",
+                background: "rgba(255, 255, 255, 0.2)",
+                border: "none",
+                borderRadius: "50%",
+                width: "50px",
+                height: "50px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                color: "white",
+                fontSize: "24px"
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setZoomedImage(null);
+              }}
+            >
+              <X />
+            </button>
+            <img
+              src={zoomedImage}
+              alt="Zoomed training image"
+              style={{
+                maxWidth: "90%",
+                maxHeight: "90%",
+                objectFit: "contain",
+                borderRadius: "8px"
+              }}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        )}
+      </div>
+    );
   };
 
   const renderResultsPage = () => {
@@ -213,6 +358,23 @@ function App() {
           }}
         >
           <Play /> {currentView === 'main' ? 'Results' : 'Back to Main'}
+        </button>
+        <button
+          onClick={() => setCurrentView(currentView === 'main' ? 'data' : 'main')}
+          style={{
+            background: "none",
+            border: "none",
+            color: "inherit",
+            textDecoration: "none",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "4px",
+            cursor: "pointer",
+            fontSize: "inherit",
+            fontFamily: "inherit",
+          }}
+        >
+          <Database /> {currentView === 'main' ? 'Data' : 'Back to Main'}
         </button>
       </div>
       
@@ -425,8 +587,10 @@ function App() {
         </div>
       </Carousel>
         </>
-      ) : (
+      ) : currentView === 'results' ? (
         renderResultsPage()
+      ) : (
+        renderDataPage()
       )}
     </div>
   );
