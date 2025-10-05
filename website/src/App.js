@@ -12,6 +12,10 @@ import alienTrain3 from "./assets/alien/train3.jpg";
 import asTrain1 from "./assets/american_psycho/train1.jpg";
 import asTrain2 from "./assets/american_psycho/train2.jpg";
 import asTrain3 from "./assets/american_psycho/train3.png";
+import asTrain4 from "./assets/american_psycho/train4.png";
+import asTrain5 from "./assets/american_psycho/train5.jpg";
+import asTrain6 from "./assets/american_psycho/train6.jpg";
+import asTrain7 from "./assets/american_psycho/train7.jpg";
 
 import shiningTrain1 from "./assets/the_shining/train1.jpg";
 import shiningTrain2 from "./assets/the_shining/train2.jpg";
@@ -26,6 +30,9 @@ import pasTrain3 from "./assets/passengers/train3.jpg";
 import subTrain1 from "./assets/substance/train1.jpg";
 import subTrain2 from "./assets/substance/train2.jpg";
 import subTrain3 from "./assets/substance/train3.jpg";
+import subTrain4 from "./assets/substance/train4.jpg";
+import subTrain5 from "./assets/substance/train5.jpg";
+import subTrain6 from "./assets/substance/train6.jpg";
 
 // Import videos
 import alienVideo from "./assets/alien/video_alien.mp4";
@@ -75,8 +82,8 @@ function App() {
     // Training images mapping - you'll need to import additional images
     const trainingImagesMap = {
       "The Shining": [shiningTrain1, shiningTrain2, shiningTrain3, shiningTrain4, shiningTrain5],
-      "The Substance": [subTrain1, subTrain2, subTrain3],
-      "American Psycho": [asTrain1, asTrain2, asTrain3],
+      "The Substance": [subTrain1, subTrain2, subTrain3, subTrain4, subTrain5, subTrain6],
+      "American Psycho": [asTrain1, asTrain2, asTrain3, asTrain4, asTrain5, asTrain6, asTrain7],
       "Passengers": [pasTrain1, pasTrain2, pasTrain3],
       "Alien": [alienTrain1, alienTrain2, alienTrain3]
     };
