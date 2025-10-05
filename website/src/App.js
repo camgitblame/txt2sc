@@ -190,7 +190,7 @@ function App() {
             </button>
             <img
               src={zoomedImage}
-              alt="Zoomed training image"
+              alt="Zoomed training"
               style={{
                 maxWidth: "90%",
                 maxHeight: "90%",
