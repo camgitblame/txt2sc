@@ -1,4 +1,4 @@
-# Text2Scene Website
+# Text 2 Movie Scene Website
 
 This is the project website for Text-to-3D Scene Generation for Movie Walkthroughs
 
