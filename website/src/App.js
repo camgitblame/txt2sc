@@ -356,7 +356,7 @@ function App() {
           <ScrollText /> Paper
         </button>
         <button
-          onClick={() => setCurrentView(currentView === 'main' ? 'results' : 'main')}
+          onClick={() => setCurrentView(currentView === 'results' ? 'main' : 'results')}
           style={{
             background: "none",
             border: "none",
@@ -370,10 +370,10 @@ function App() {
             fontFamily: "inherit",
           }}
         >
-          <Play /> {currentView === 'main' ? 'Results' : 'Back to Main'}
+          <Play /> {currentView === 'results' ? 'Back to Main' : 'Results'}
         </button>
         <button
-          onClick={() => setCurrentView(currentView === 'main' ? 'data' : 'main')}
+          onClick={() => setCurrentView(currentView === 'data' ? 'main' : 'data')}
           style={{
             background: "none",
             border: "none",
@@ -387,7 +387,7 @@ function App() {
             fontFamily: "inherit",
           }}
         >
-          <Database /> {currentView === 'main' ? 'Data' : 'Back to Main'}
+          <Database /> {currentView === 'data' ? 'Back to Main' : 'Data'}
         </button>
       </div>
       
