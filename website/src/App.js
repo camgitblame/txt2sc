@@ -8,6 +8,8 @@ import { useState } from "react";
 import alienTrain1 from "./assets/alien/train1.jpg";
 import alienTrain2 from "./assets/alien/train2.jpg";
 import alienTrain3 from "./assets/alien/train3.jpg";
+import alienTrain4 from "./assets/alien/train4.jpg";
+import alienTrain5 from "./assets/alien/train5.jpg";
 
 import asTrain1 from "./assets/american_psycho/train1.jpg";
 import asTrain2 from "./assets/american_psycho/train2.jpg";
@@ -26,6 +28,10 @@ import shiningTrain5 from "./assets/the_shining/train5.png";
 import pasTrain1 from "./assets/passengers/train1.jpg";
 import pasTrain2 from "./assets/passengers/train2.jpg";
 import pasTrain3 from "./assets/passengers/train3.jpg";
+import pasTrain4 from "./assets/passengers/train4.jpg";
+import pasTrain5 from "./assets/passengers/train5.jpg";
+import pasTrain6 from "./assets/passengers/train6.jpg";
+import pasTrain7 from "./assets/passengers/train7.jpg";
 
 import subTrain1 from "./assets/substance/train1.jpg";
 import subTrain2 from "./assets/substance/train2.jpg";
@@ -84,8 +90,8 @@ function App() {
       "The Shining": [shiningTrain1, shiningTrain2, shiningTrain3, shiningTrain4, shiningTrain5],
       "The Substance": [subTrain1, subTrain2, subTrain3, subTrain4, subTrain5, subTrain6],
       "American Psycho": [asTrain1, asTrain2, asTrain3, asTrain4, asTrain5, asTrain6, asTrain7],
-      "Passengers": [pasTrain1, pasTrain2, pasTrain3],
-      "Alien": [alienTrain1, alienTrain2, alienTrain3]
+      "Passengers": [pasTrain1, pasTrain2, pasTrain3, pasTrain4, pasTrain5, pasTrain6, pasTrain7],
+      "Alien": [alienTrain1, alienTrain2, alienTrain3, alienTrain4, alienTrain5]
     };
 
     return (
